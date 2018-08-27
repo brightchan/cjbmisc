@@ -7,14 +7,15 @@
 \alias{plot_lm}
 \title{Miscellaneous plotting functions}
 \usage{
-perc_barplot(ggdf, x, y, title = NULL, col = colpal, xlab = x, ylab = y,
-  width = 0.9, aspect.ratio = 1.4, show.count = TRUE, anno.vjust = 0.04,
-  ...)
+perc_barplot(ggdf, x, y, title = NULL, col = comp_hm_colist_full$disc,
+  xlab = x, ylab = y, width = 0.9, aspect.ratio = 1.4,
+  show.count = TRUE, anno.textsize = 4, anno.vjust = 0.04, ...)
 
 violin(ggdf, x, y, test = "wilcox.test", title = NULL, col = NULL,
   xlab = x, ylab = y, width = 0.9, aspect.ratio = 1.4,
-  show.mean = TRUE, show.count = TRUE, anno.vjust = 0.1,
-  anno.textsize = 4, plot.it = TRUE, ...)
+  show.mean = TRUE, show.count = TRUE, label = NULL,
+  symnum.args = list(), anno.vjust = 0.1, anno.textsize = 4,
+  plot.it = TRUE, ...)
 
 plot_lm(df, f, title = "", col = "#00DD006F", pch = 16, ...)
 }
@@ -45,7 +46,10 @@ plot_lm(df, f, title = "", col = "#00DD006F", pch = 16, ...)
 
 \item{pch}{plot_lm:dot style}
 
-\item{anno.hjust, anno.textsize}{violin:change the position and text size of the significance values}
+\item{anno.hjust, anno.textsize}{violin:change the position and text size of the significance/count values}
+}
+\value{
+A ggplot object
 }
 \description{
 A group of functions for miscellaneous plots.

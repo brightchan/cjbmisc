@@ -5,29 +5,34 @@
 \title{Plot multiple features of subtypes}
 \usage{
 plot_feat_subtype(plotdf, subtype, feat.plot, cont.plot = "boxplot",
-  cont.test = "wilcox.test", cont.show.mean = FALSE, show.count = TRUE,
-  disc.col = comp_hm_colist_full, cont.col = comp_hm_colist_full$disc,
-  disc.width = 0.8, cont.width = 0.9, cont.anno.vjust = 0.2,
-  disc.anno.vjust = 0.04, aspect.ratio = 1.4)
+  cont.test = "wilcox.test", label = NULL, symnum.args = list(),
+  cont.show.mean = FALSE, show.count = TRUE,
+  cont.col = comp_hm_colist_full$disc, disc.col = comp_hm_colist_full,
+  disc.width = 0.8, cont.width = 0.9, anno.textsize = 4,
+  cont.anno.vjust = 0.2, disc.anno.vjust = 0.04, aspect.ratio = 1.4)
 }
 \arguments{
 \item{plotdf}{dataframe with rows of samples and columns of features, one column should contain the subtype info.}
 
 \item{subtype}{column name of the subtype}
 
-\item{feat.plot}{vector of the features to be plotted}
+\item{feat.plot}{character vector of the features to be plotted}
 
 \item{cont.plot}{character of either "boxplot" or "violin"}
 
 \item{cont.test}{the test to be used for the significant test for continuous variables}
 
+\item{label, symnum.args}{change the label style ("p.signif" or "p.format") of the significance. See \code{\link[ggpubr]{stat_compare_means}}}
+
 \item{cont.show.mean}{boolean of whether to show the mean as a green dot for continuous variables}
 
 \item{show.count}{whether to show the total count of each catergory}
 
+\item{cont.col}{vector of colors for continuous variables}
+
 \item{disc.col}{list of named vectors for colors of discrete variables}
 
-\item{cont.col}{vector of colors for continuous variables}
+\item{anno.textsize}{change text size of the significance values}
 
 \item{cont.anno.vjust, disc.anno.vjust}{numeric to tweak the position of the pvalue annotation on the plot}
 }

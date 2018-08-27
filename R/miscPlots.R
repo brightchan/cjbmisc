@@ -17,11 +17,11 @@
 #' @param aspect.ratio perc_barplot & violin:aspect ratio of the final plot
 #' @param show.count perc_barplot & violin:whether to show the total count of each catergory
 #' @param show.mean violin:whether to show the mean with a green dot
-#' @param anno.hjust,anno.textsize violin:change the position and text size of the significance values
+#' @param anno.hjust,anno.textsize violin:change the position and text size of the significance/count values
 #' @param pch plot_lm:dot style
 #' @param plot.it if FALSE, no plot printed, only return the plot object
 #' @param ... in perc_barplot and violin: pass to \code{\link[ggplot2]{theme}};\cr in plot_lm: pass to \code{\link[graphics]{plot}}
-#' @return
+#' @return A ggplot object
 #' @name miscPlots
 NULL
 #' @rdname miscPlots
@@ -29,9 +29,9 @@ NULL
 #' @import ggplot2
 #' @importFrom scales percent
 #Percentage Barplot
-perc_barplot <- function(ggdf,x,y,title=NULL,col=colpal,
+perc_barplot <- function(ggdf,x,y,title=NULL,col=comp_hm_colist_full$disc,
                          xlab=x,ylab=y,width=0.9,aspect.ratio=1.4,
-                         show.count=TRUE,anno.vjust=0.04,...){
+                         show.count=TRUE,anno.textsize=4,anno.vjust=0.04,...){
   ggdf[,x] <- droplevels(as.factor(ggdf[,x]))
   #remove NA
   ggdf <- ggdf[complete.cases(ggdf[,y]),]
@@ -50,7 +50,7 @@ perc_barplot <- function(ggdf,x,y,title=NULL,col=colpal,
     scale_y_continuous(labels=scales::percent,limits=c(0,1+anno.vjust),breaks=seq(0,1,0.25))+
     ggtitle(title)+
     labs(x=xlab,y=ylab)+
-    annotation_custom(grid::textGrob(paste0("p=",signif(pvalue,2))),
+    annotation_custom(grid::textGrob(paste0("p=",signif(pvalue,2)),gp = grid::gpar(fontsize = 3*anno.textsize)),
                       xmin = -Inf, xmax = Inf,ymin=1+1.5*anno.vjust,ymax=1+anno.vjust)+
     #guides(fill=F)+
     guides(fill=guide_legend(title=y))+
@@ -62,7 +62,7 @@ perc_barplot <- function(ggdf,x,y,title=NULL,col=colpal,
       panel.border = element_rect(linetype = "solid",fill=NA),
       #plot.title=element_text(face="bold",hjust=0.5,size=18),
       aspect.ratio=aspect.ratio,...)
-  if(show.count) p <- p+geom_text(data=xcount,mapping=aes(x=Var1,y=-anno.vjust,vjust=0.5,label=Freq))+
+  if(show.count) p <- p+geom_text(data=xcount,mapping=aes(x=Var1,y=-anno.vjust,vjust=0.5,label=Freq),size=anno.textsize)+
     scale_y_continuous(labels=scales::percent,limits=c(-anno.vjust,1+anno.vjust),breaks=seq(0,1,0.25))
   return(p)
 }
@@ -70,20 +70,24 @@ perc_barplot <- function(ggdf,x,y,title=NULL,col=colpal,
 #' @export
 #' @import ggplot2
 #' @import ggpubr
-#' @importFrom ggsignif geom_signif
+#' @importFrom ggpubr stat_compare_means
 #' @importFrom EnvStats stat_n_text
+#' @importFrom gginnards which_layers
 #Violin Plot with significance level for 2/3 variables
 violin <- function(ggdf,x,y,test="wilcox.test",title=NULL,col=NULL,xlab=x,ylab=y,
                    width=0.9,aspect.ratio=1.4,
                    show.mean=TRUE,show.count=TRUE,
+                   label=NULL,symnum.args=list(),
                    anno.vjust=0.1,anno.textsize=4,plot.it=TRUE,...){
   dat <- ggdf[,y]
   spr <- max(dat,na.rm=TRUE)-min(dat,na.rm=TRUE) #spread
   adj <- spr*anno.vjust # unit of adjustment as anno.vjust of the spread
-  ylim <- c(min(dat,na.rm=TRUE)-1.5*adj,max(dat,na.rm=TRUE)+2*adj)
+  if(show.count){
+    ylim <- c(min(dat,na.rm=TRUE)-1.5*adj,max(dat,na.rm=TRUE)+2*adj)
+  } else ylim <- c(min(dat,na.rm=TRUE),max(dat,na.rm=TRUE)+2*adj)
   if(is.null(col)){
     p <- ggplot(subset(ggdf,!is.na(get(x))),aes(factor(get(x)),get(y)))+
-      geom_violin(width=width)
+      geom_violin(width=width)+guides(fill="none")
   } else {
     p <- ggplot(subset(ggdf,!is.na(get(x))),aes(factor(get(x)),get(y)))+
       geom_violin(aes(fill=get(x)),width=width)+
@@ -91,7 +95,7 @@ violin <- function(ggdf,x,y,test="wilcox.test",title=NULL,col=NULL,xlab=x,ylab=y
       guides(fill=guide_legend(title=x))
   }
   p <- p+
-    geom_boxplot(width=0.15*width)+
+    geom_boxplot(width=0.13*width)+
     ggtitle(title)+
     ylab(ylab)+
     xlab(xlab)+
@@ -100,14 +104,23 @@ violin <- function(ggdf,x,y,test="wilcox.test",title=NULL,col=NULL,xlab=x,ylab=y
   #comp <- combn(unique(na.omit(ggdf[,x])),2,as.character,simplify=F)
   if (length(na.omit(unique(ggdf[,x])))==2){
     p <- p+ylim(ylim)+
-      geom_signif(comparisons=list(c(1,2)),test=test,textsize=anno.textsize,
-                  y_position=c(ylim[2]-0.5*adj))
+      stat_compare_means(comparisons=list(c(1,2)),method=test,
+                         symnum.args=symnum.args,label=label,
+                         label.y=c(ylim[2]-0.5*adj))
+      #geom_signif(comparisons=list(c(1,2)),test=test,textsize=anno.textsize,
+      #            y_position=c(ylim[2]-0.5*adj))
+    p$layers[[which_layers(p, "GeomSignif")]]$aes_params$textsize <- anno.textsize
   } else if (length(na.omit(unique(ggdf[,x])))==3){
     p <- p+ylim(ylim)+
-      geom_signif(comparisons=list(c(1,2),c(2,3),c(1,3)),test=test,textsize=anno.textsize,
-                         y_position=c(ylim[2]-1.4*adj,ylim[2]-1.4*adj,ylim[2]-0.45*adj))
-  } else p <- p+stat_compare_means(method=test)
-  if (show.count) p <- p+stat_n_text()
+      stat_compare_means(comparisons=list(c(1,2),c(2,3),c(1,3)),method=test,
+                  symnum.args=symnum.args,label=label,
+                  label.y=c(ylim[2]-1.4*adj,ylim[2]-1.4*adj,ylim[2]-0.45*adj))
+    p$layers[[which_layers(p, "GeomSignif")]]$aes_params$textsize <- anno.textsize
+  } else p <- p+stat_compare_means(method="kruskal.test",
+                                   label.y=c(ylim[2]-1.3*adj),
+                                   size=anno.textsize)+
+         ylim(c(ylim[1],ylim[2]-adj))
+  if (show.count) p <- p+stat_n_text(size=anno.textsize)
   if (show.mean) p <- p+stat_summary(fun.y=mean, geom="point", shape=19, size=2,color="green")
   if(plot.it) print(p)
   return(p)
