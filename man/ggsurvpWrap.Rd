@@ -6,8 +6,8 @@
 A warpper to plot survival plots
 to further customize the plot,}
 \usage{
-ggsurvpWrap(survdf, fac, title = NULL, col = comp_hm_colist_full$disc,
-  risk.table = F, discretize.method = median, xlim = c(0, 120),
+ggsurvpWrap(survdf, fac, cont.to.dis = NA, title = fac,
+  col = comp_hm_colist_full$disc, risk.table = F, xlim = c(0, 120),
   break.time.by = 60, textsize = 10, pval.method = T, ...)
 }
 \arguments{
@@ -15,11 +15,13 @@ ggsurvpWrap(survdf, fac, title = NULL, col = comp_hm_colist_full$disc,
 
 \item{fac}{character of the column name in the survdf to stratify the patients}
 
+\item{cont.to.dis}{if \emph{fac} is numeric, how to discretize it. Can be a funciton (Default \emph{median}) or cutoff points (n-1 points)}
+
 \item{col}{vector of colors}
 
-\item{discretize.method}{if \emph{fac} is numeric, how to discretizeit. Can be funcitons (Default median) or cutoff points (n-1 points)}
+\item{xlim, break.time.by, pval.method, risk.table, ...}{arguments to \code{\link[survminer]{ggsurvplot}}}
 
-\item{...}{arguments to ggsurvplot}
+\item{textsize}{pass to ggplot global text size}
 }
 \value{
 A object of class ggsurvplot
@@ -28,7 +30,4 @@ A object of class ggsurvplot
 Survival plot with ggsurvplot
 A warpper to plot survival plots
 to further customize the plot,
-}
-\seealso{
-\code{\link[survminer]{ggsurvplot}}
 }

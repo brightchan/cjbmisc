@@ -28,10 +28,11 @@ p_lm(df, v1, v2)
 \description{
 A group of functions to return only the p values from various of tests.
 \itemize{
-  \item discretize: cut a vector by a function or by certain cutoff value using cut.\cr
-    Return a factor by replacing the original ones with the discrete value regions (<=xxx, xxx-xxx, >xxx).\cr
-    \emph{NOTE: NAs are automatically removed}
-  \item trisect: quantile a vector into three equal parts. To be used with discretize: \code{discretize(x,trisect)}
+  \item p_fish.chi.t: Try first use \code{\link[cjbmisc]{fish.t}} to get p value,\cr
+  if failed (usually due to too many catergories), then use \code{\link[cjbmisc]{chisq.t}} with popup warning.
+  \item p_aov.t: p-value from \code{\link[stats]{aov}}
+  \item p_krus: p-value from \code{\link[stats]{kruskal.test}}
+  \item p_lm: p-value of the coefficient from the univariate \code{\link[stats]{lm}}
 }
 }
 \seealso{

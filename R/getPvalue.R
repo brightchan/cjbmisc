@@ -1,18 +1,19 @@
-#' Returning only the p values 
-#' 
+#' Returning only the p values
+#'
 #' A group of functions to return only the p values from various of tests.
 #' \itemize{
-#'   \item discretize: cut a vector by a function or by certain cutoff value using cut.\cr
-#'     Return a factor by replacing the original ones with the discrete value regions (<=xxx, xxx-xxx, >xxx).\cr
-#'     \emph{NOTE: NAs are automatically removed}
-#'   \item trisect: quantile a vector into three equal parts. To be used with discretize: \code{discretize(x,trisect)}
+#'   \item p_fish.chi.t: Try first use \code{\link[cjbmisc]{fish.t}} to get p value,\cr
+#'   if failed (usually due to too many catergories), then use \code{\link[cjbmisc]{chisq.t}} with popup warning.
+#'   \item p_aov.t: p-value from \code{\link[stats]{aov}}
+#'   \item p_krus: p-value from \code{\link[stats]{kruskal.test}}
+#'   \item p_lm: p-value of the coefficient from the univariate \code{\link[stats]{lm}}
 #' }
 #' @param df numeric dataframe
 #' @param v1,v2 character of the column name in the df
 #' @param alt passing to alternative in \code{\link[stats]{fisher.test}}, should be one of "two.sided", "greater" or "less". You can specify just the initial letter. Only used in the 2 by 2 case.
 #' @param ws passing to workspace size in \code{\link[stats]{fisher.test}},  integer specifying the size of the workspace used in the network algorithm. In units of 4 bytes.
 #' @seealso \code{\link{chisq.t}}, \code{\link{fish.t}}, \code{\link[stats]{fisher.test}},\code{\link[stats]{chisq.test}},
-#' \code{\link[stats]{aov}},\code{\link[stats]{kruskal.test}},\code{\link[stats]{lm}} 
+#' \code{\link[stats]{aov}},\code{\link[stats]{kruskal.test}},\code{\link[stats]{lm}}
 #' @name getPvalue
 NULL
 #' @rdname getPvalue

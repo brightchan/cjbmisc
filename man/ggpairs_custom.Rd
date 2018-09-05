@@ -4,17 +4,27 @@
 \alias{ggpairs_custom}
 \title{Plot pairwise correlations of multiple features}
 \usage{
-ggpairs_custom(ggdf, feat.plot = NULL, ...)
+ggpairs_custom(ggdf, feat.plot = NULL, colist = comp_hm_colist_full,
+  sig.col = c("white", "thistle1", "orchid1"), plot.it = FALSE,
+  signif.cutoff = 0.05, ...)
 }
 \arguments{
 \item{ggdf}{dataframe with rows of samples and columns of features}
 
 \item{feat.plot}{character vector of the features to be plotted. If NULL then all columns will be plotted}
 
+\item{colist}{a named list of named vector of colors to be used for each feature. Missing ones are automatically handled.}
+
+\item{sig.col}{vector of 3 colors for nonsignif, lower and higher bound of the significance.}
+
+\item{plot.it}{if FALSE, no plot printed, only return the object. Use ggsave(plot=p$plot) to plot.}
+
+\item{signif.cutoff}{cutoff point for significant p-value. A colored (sig.col[3]) frame will be shown to significant plots.}
+
 \item{...}{pass to \code{\link[GGally]{ggpairs}}}
 }
 \value{
-a "gg" "ggmatrix" plotable and ggsavable object
+a list of two: $plot is "gg" "ggmatrix" plotable and ggsavable object; $p.value is the table of correlation pvalues
 }
 \description{
 Only a beta version

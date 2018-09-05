@@ -6,6 +6,7 @@
 #' }
 #' @param df dataframe
 #' @param subtype character of the name of column in the df, containing subtype info
+#' @param subtype.col named color for the subtypes. if NULL, assign automatically.
 #' @param cha vector of characters to be plotted
 #' @param topbar character of the name of a numeric column with which a bar will be plotted on the top
 #' @param order_by character of the name of column to order the heatmap
@@ -23,13 +24,18 @@ NULL
 #' @importFrom circlize colorRamp2
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom grid gpar
+#' @importFrom grid grid.text
 #
 #input dataframe, with the subtype, and characters to be shown as heatmap for each subtype.
 #plot using pic function, outp file and size w,h
 # if topbar is a column, sort by that column and add top annotation bar
-subtypeChaHM_col <- function(df,subtype,cha,topbar,order_by=topbar,pic,outp,w,h,colist=comp_hm_colist_full){
-  lel <- levels(as.factor(df[,subtype]))
-  colsubtype <- setNames(RColorBrewer::brewer.pal(8,"YlGnBu")[c(2,4,6,8)],lel)
+subtypeChaHM_col <- function(df,subtype,subtype.col=NULL,cha,topbar,order_by=topbar,
+                             colist=comp_hm_colist_full,
+                             pic,outp,w,h){
+  if(is.null(subtype.col)){
+    lel <- levels(as.factor(df[,subtype]))
+    colsubtype <- setNames(comp_hm_colist_full$disc[1:length(lel)],lel)
+    } else colsubtype <- subtype.col
   df <- df[order(df[,order_by]),]
   colR <- circlize::colorRamp2(breaks = c(min(df[,topbar],na.rm=T),
                                 median(df[,topbar],na.rm=T),
@@ -73,17 +79,24 @@ subtypeChaHM_col <- function(df,subtype,cha,topbar,order_by=topbar,pic,outp,w,h,
                 cluster_rows = FALSE,
                 show_column_names = F,
                 show_row_names = F)
-  pic(outp,w,h)
-  draw(hm,gap = unit(5, "mm"),
-       padding = unit(c(25, 45, 25, 5), "mm"), #space around plot
-       show_annotation_legend = T,
-       heatmap_legend_side="right",
-       annotation_legend_side="top")
-  for(an in colnames(df[,cha])){
-    decorate_annotation(an,grid.text(an, unit(-5,"mm"), just = "right"))
-  }
-  decorate_annotation("barplot",grid.text(topbar, unit(-5,"mm"), just = "right"))
-  dev.off()
+  tryCatch(
+    { pic(outp,w,h)
+      draw(hm,gap = unit(5, "mm"),
+           padding = unit(c(25, 45, 25, 5), "mm"), #space around plot
+           show_annotation_legend = T,
+           heatmap_legend_side="right",
+           annotation_legend_side="top")
+      for(an in colnames(df[,cha])){
+        decorate_annotation(an,grid.text(an, unit(-5,"mm"), just = "right"))
+      }
+      decorate_annotation("barplot",grid.text(topbar, unit(-5,"mm"), just = "right"))
+      dev.off()
+    },
+    error=function(e){
+      warning(e)
+      warning("Plotting Aborted.")
+      dev.off()}
+  )
   invisible(NULL)
 }
 

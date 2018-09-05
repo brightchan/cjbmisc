@@ -4,20 +4,29 @@
 \alias{miscPlots}
 \alias{perc_barplot}
 \alias{violin}
+\alias{boxjitter}
 \alias{plot_lm}
 \title{Miscellaneous plotting functions}
 \usage{
 perc_barplot(ggdf, x, y, title = NULL, col = comp_hm_colist_full$disc,
   xlab = x, ylab = y, width = 0.9, aspect.ratio = 1.4,
-  show.count = TRUE, anno.textsize = 4, anno.vjust = 0.04, ...)
+  show.count = TRUE, anno.textsize = 4, anno.vjust = 0.04,
+  border = TRUE, plot.it = FALSE, highlight.signif = TRUE,
+  highlight.signif.col = "orchid1", signif.cutoff = 0.05, ...)
 
 violin(ggdf, x, y, test = "wilcox.test", title = NULL, col = NULL,
   xlab = x, ylab = y, width = 0.9, aspect.ratio = 1.4,
   show.mean = TRUE, show.count = TRUE, label = NULL,
   symnum.args = list(), anno.vjust = 0.1, anno.textsize = 4,
-  plot.it = TRUE, ...)
+  border = TRUE, plot.it = FALSE, highlight.signif = TRUE,
+  highlight.signif.col = "orchid1", signif.cutoff = 0.05,
+  plot.type = "violin", box.notch = FALSE, ...)
 
-plot_lm(df, f, title = "", col = "#00DD006F", pch = 16, ...)
+boxjitter(...)
+
+plot_lm(ggdf, x, y, title = NULL, col = "#00DD006F", show.anno = TRUE,
+  plot.it = TRUE, highlight.signif = TRUE,
+  highlight.signif.col = "orchid1", signif.cutoff = 0.05, ...)
 }
 \arguments{
 \item{ggdf, df}{dataframe with rows of samples and columns of features}
@@ -26,7 +35,7 @@ plot_lm(df, f, title = "", col = "#00DD006F", pch = 16, ...)
 
 \item{title}{plot title}
 
-\item{col}{named vector of color (as long as the values are contained in the names), or unnamed vector, then color would be assigned based on the order of the levels.}
+\item{col}{For perc_barplot & violin: named vector of color (as long as the values are contained in the names), or unnamed vector, then color would be assigned based on the order of the levels.\cr For plot_lm: one color with alpha.}
 
 \item{xlab, ylab}{axis label}
 
@@ -36,17 +45,24 @@ plot_lm(df, f, title = "", col = "#00DD006F", pch = 16, ...)
 
 \item{show.count}{perc_barplot & violin:whether to show the total count of each catergory}
 
-\item{...}{in perc_barplot and violin: pass to \code{\link[ggplot2]{theme}};\cr in plot_lm: pass to \code{\link[graphics]{plot}}}
-
-\item{show.mean}{violin:whether to show the mean with a green dot}
+\item{border}{perc_barplot,violin: whether add a solid border to the plot}
 
 \item{plot.it}{if FALSE, no plot printed, only return the plot object}
 
-\item{f}{formula, (y~x)}
+\item{highlight.signif, highlight.signif.col, signif.cutoff}{Whether to highlight (highlight.signif) a significant plot with a color border (highlight.signif.col) according to the p-value cutoff (signif.cutoff).\cr
+pvalue calculationg method: perc_barplot-\code{\link{p_fish.chi.t}}; violin-\code{\link{p_krus}}; plot_lm-from the univariate \code{\link[stats]{lm}}}
 
-\item{pch}{plot_lm:dot style}
+\item{...}{in perc_barplot, violin, plot_lm: pass to \code{\link[ggplot2]{theme}}}
+
+\item{show.mean}{violin:whether to show the mean with a green dot}
+
+\item{box.notch}{violin/boxjitter: whether show notch style box plot}
+
+\item{show.anno}{plot_lm: whether to show the R2, slope and slope p value}
 
 \item{anno.hjust, anno.textsize}{violin:change the position and text size of the significance/count values}
+
+\item{pch}{plot_lm:dot style}
 }
 \value{
 A ggplot object

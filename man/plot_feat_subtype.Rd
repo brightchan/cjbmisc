@@ -8,8 +8,11 @@ plot_feat_subtype(plotdf, subtype, feat.plot, cont.plot = "boxplot",
   cont.test = "wilcox.test", label = NULL, symnum.args = list(),
   cont.show.mean = FALSE, show.count = TRUE,
   cont.col = comp_hm_colist_full$disc, disc.col = comp_hm_colist_full,
-  disc.width = 0.8, cont.width = 0.9, anno.textsize = 4,
-  cont.anno.vjust = 0.2, disc.anno.vjust = 0.04, aspect.ratio = 1.4)
+  disc.width = 0.8, cont.width = 0.9, disc.border = TRUE,
+  cont.border = TRUE, anno.textsize = 4, cont.anno.vjust = 0.2,
+  disc.anno.vjust = 0.04, aspect.ratio = 1.4, legend.position = "bottom",
+  highlight.signif = TRUE, highlight.signif.col = "red",
+  signif.cutoff = 0.05, ...)
 }
 \arguments{
 \item{plotdf}{dataframe with rows of samples and columns of features, one column should contain the subtype info.}
@@ -32,11 +35,21 @@ plot_feat_subtype(plotdf, subtype, feat.plot, cont.plot = "boxplot",
 
 \item{disc.col}{list of named vectors for colors of discrete variables}
 
+\item{disc.border, cont.border}{show border or not for the discrete/continuous variables. pass to \code{\link{perc_barplot}},\code{\link{violin}}}
+
 \item{anno.textsize}{change text size of the significance values}
 
 \item{cont.anno.vjust, disc.anno.vjust}{numeric to tweak the position of the pvalue annotation on the plot}
+
+\item{aspect.ratio}{the height width ratio of the figure}
+
+\item{legend.position}{position of the legends}
+
+\item{highlight.signif, highlight.signif.col, signif.cutoff}{Whether to highlight (highlight.signif) a significant plot with a color border (highlight.signif.col) according to the p-value cutoff (signif.cutoff). See \code{\link{miscPlots}}}
+
+\item{...}{pass to \code{\link[ggplot2]{theme}} for each individual plot}
 }
 \description{
 Plot percentage barplot or violin/boxplot for discrete or continuous variables of each subtype.
-Return a list of ggplots that can be arranged into figure panel with ggarrange.
+Return a list of ggplots that can be arranged into figure panel with \code{\link[ggpubr]{ggarrange}}.
 }

@@ -7,8 +7,8 @@
 \alias{olpByPerc}
 \title{Complex heatmap plots}
 \usage{
-subtypeChaHM_col(df, subtype, cha, topbar, order_by = topbar, pic, outp, w, h,
-  colist = comp_hm_colist_full)
+subtypeChaHM_col(df, subtype, subtype.col = NULL, cha, topbar,
+  order_by = topbar, colist = comp_hm_colist_full, pic, outp, w, h)
 
 olpByPerc(gr1, gr2, thres)
 }
@@ -17,19 +17,21 @@ olpByPerc(gr1, gr2, thres)
 
 \item{subtype}{character of the name of column in the df, containing subtype info}
 
+\item{subtype.col}{named color for the subtypes. if NULL, assign automatically.}
+
 \item{cha}{vector of characters to be plotted}
 
 \item{topbar}{character of the name of a numeric column with which a bar will be plotted on the top}
 
 \item{order_by}{character of the name of column to order the heatmap}
 
+\item{colist}{the comprehensive color list.\cr By default it is comp_hm_colist_full loaded in this package}
+
 \item{pic}{function of plotting device, eg png, pdf, etc.}
 
 \item{outp}{character of output folder and file name}
 
 \item{w, h}{width and height of the output plot}
-
-\item{colist}{the comprehensive color list.\cr By default it is comp_hm_colist_full loaded in this package}
 
 \item{df}{dataframe}
 
