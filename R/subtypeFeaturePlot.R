@@ -1,7 +1,8 @@
 #' Plot multiple features of subtypes
 #'
 #' Plot percentage barplot or violin/boxplot for discrete or continuous variables of each subtype.
-#' Usage: plot_feat_subtype(df,"Stage",c("Ploidy","Purity","EGFR","Smoker"))
+#' Usage: p <- plot_feat_subtype(df,"Stage",c("Ploidy","Purity","EGFR","Smoker"))\cr
+#' then ggpubr::ggarrange(plotlist=p,nrow=y,ncol=x,align="hv")
 #' Return a list of ggplots that can be arranged into figure panel with \code{\link[ggpubr]{ggarrange}}.
 #'
 #' @param plotdf dataframe with rows of samples and columns of features, one column should contain the subtype info.

@@ -1,7 +1,8 @@
 #' Plot pairwise correlations of multiple features
 #'
 #' Plot a big complex correlation map of every features in a dataframe or specific features (feat.plot).
-#' Usage: ggpairs_custom(df) (all features). Or ggpairs_custom(df,c("Ploidy","Purity","EGFR","Smoker"))
+#' Usage: ggpairs_custom(df,plot.it=TRUE) (all features). Or p<-ggpairs_custom(df,c("Ploidy","Purity","EGFR","Smoker"))\cr
+#' then ggsave("plot.pdf",p$plot)
 #'
 #' @param ggdf dataframe with rows of samples and columns of features
 #' @param feat.plot character vector of the features to be plotted. If NULL then all columns will be plotted

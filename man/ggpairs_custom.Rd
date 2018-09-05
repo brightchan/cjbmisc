@@ -28,5 +28,6 @@ a list of two: $plot is "gg" "ggmatrix" plotable and ggsavable object; $p.value 
 }
 \description{
 Plot a big complex correlation map of every features in a dataframe or specific features (feat.plot).
-Usage: ggpairs_custom(df) (all features). Or ggpairs_custom(df,c("Ploidy","Purity","EGFR","Smoker"))
+Usage: ggpairs_custom(df,plot.it=TRUE) (all features). Or p<-ggpairs_custom(df,c("Ploidy","Purity","EGFR","Smoker"))\cr
+then ggsave("plot.pdf",p$plot)
 }
