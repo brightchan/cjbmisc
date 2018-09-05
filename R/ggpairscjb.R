@@ -171,7 +171,7 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
       #   geom_bar(stat="identity",colour="black")+
       #   scale_fill_manual(values=col)+
       #   theme_minimal()
-      perc_barplot(data,x=x,y=y,aspect.ratio=1,col=col,anno.textsize=2,signif.cutoff=signif.cutoff,border=F)
+      perc_barplot(data,x=x,y=y,aspect.ratio=1,col=col,anno.textsize=3,signif.cutoff=signif.cutoff,border=F)
     }
 
     ggplot_box <- function(data, mapping,col=colist){
@@ -186,7 +186,7 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
         col <- col[[x]]
       } else col <- comp_hm_colist_full$disc
       boxjitter(data,x,y,aspect.ratio=1,col=col,border=F,plot.it=FALSE,
-                anno.textsize=2,signif.cutoff=signif.cutoff)
+                anno.textsize=3,signif.cutoff=signif.cutoff)
     }
 
     ggplot_violin <- function(data, mapping,col=colist){
@@ -201,7 +201,7 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
         col <- col[[x]]
       } else col <- comp_hm_colist_full$disc
       violin(data,x,y,aspect.ratio=1,col=col,border=F,plot.it=FALSE,
-             anno.textsize=2,signif.cutoff=signif.cutoff)
+             anno.textsize=3,signif.cutoff=signif.cutoff)
     }
 
 
@@ -217,7 +217,8 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
       x <- quo_name(mapping$x)
       y <- quo_name(mapping$y)
       p <- plot_lm(data,x,y,plot.it=FALSE,signif.cutoff=signif.cutoff)
-      p+annotate("text",label=p$labels$caption, x=Inf, y = Inf,vjust=1,hjust=1,size=2)
+      lab <- gsub(" ","\n",p$labels$caption)
+      p+annotate("text",label=lab, x=Inf, y = Inf,vjust=1.2,hjust=1.2,size=2.5)
     }
 
     ggplot_headerblank <- function(data, mapping,col=NULL){

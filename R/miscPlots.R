@@ -196,9 +196,9 @@ plot_lm <- function(ggdf,x,y,title=NULL,col="#00DD006F",show.anno=TRUE,plot.it=T
                     highlight.signif=TRUE,highlight.signif.col="orchid1",signif.cutoff=0.05,...){
   fit <- lm(as.formula(paste0(y,"~",x)),ggdf)
   if(show.anno){
-    anno <- paste("R2=", format(summary(fit)$adj.r.squared, digits=2),
+    anno <- paste0("R2=", format(summary(fit)$adj.r.squared, digits=2),
                   " Slope=", format(summary(fit)$coefficients[2,1], digits=2),
-                  " Slope p=",format(summary(fit)$coefficients[2,4], digits=2))
+                  " Slope_p=",format(summary(fit)$coefficients[2,4], digits=2))
   } else anno <- NULL
   p <- ggplot(ggdf,aes_string(x,y))+
     geom_point(alpha = 1/2,color="green")+
