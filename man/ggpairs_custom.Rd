@@ -27,5 +27,6 @@ ggpairs_custom(ggdf, feat.plot = NULL, colist = comp_hm_colist_full,
 a list of two: $plot is "gg" "ggmatrix" plotable and ggsavable object; $p.value is the table of correlation pvalues
 }
 \description{
-Only a beta version
+Plot a big complex correlation map of every features in a dataframe or specific features (feat.plot).
+Usage: ggpairs_custom(df) (all features). Or ggpairs_custom(df,c("Ploidy","Purity","EGFR","Smoker"))
 }

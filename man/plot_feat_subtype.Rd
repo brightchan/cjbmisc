@@ -51,5 +51,6 @@ plot_feat_subtype(plotdf, subtype, feat.plot, cont.plot = "boxplot",
 }
 \description{
 Plot percentage barplot or violin/boxplot for discrete or continuous variables of each subtype.
+Usage: plot_feat_subtype(df,"Stage",c("Ploidy","Purity","EGFR","Smoker"))
 Return a list of ggplots that can be arranged into figure panel with \code{\link[ggpubr]{ggarrange}}.
 }
