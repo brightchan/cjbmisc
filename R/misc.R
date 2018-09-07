@@ -72,3 +72,4 @@ consistSymbol <- function(a,r){#a,r:numeric factor vector;r:ref
   return(temp[,which(sum==max(sum))]) # when 2 equal number occur, return both
 }
 
+

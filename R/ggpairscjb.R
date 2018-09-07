@@ -2,7 +2,7 @@
 #'
 #' Plot a big complex correlation map of every features in a dataframe or specific features (feat.plot).
 #' Usage: ggpairs_custom(df,plot.it=TRUE) (all features). Or p<-ggpairs_custom(df,c("Ploidy","Purity","EGFR","Smoker"))\cr
-#' then ggsave("plot.pdf",p$plot)
+#' then ggsave("plot.pdf",p)
 #'
 #' @param ggdf dataframe with rows of samples and columns of features
 #' @param feat.plot character vector of the features to be plotted. If NULL then all columns will be plotted
@@ -10,8 +10,9 @@
 #' @param sig.col vector of 3 colors for nonsignif, lower and higher bound of the significance.
 #' @param signif.cutoff cutoff point for significant p-value. A colored (sig.col[3]) frame will be shown to significant plots.
 #' @param plot.it if FALSE, no plot printed, only return the object. Use ggsave(plot=p$plot) to plot.
+#' @param return.pvalue whether to return a pvalue matrix. If yes, it has to plot it to generate the values (to a new device)
 #' @param ... pass to \code{\link[GGally]{ggpairs}}
-#' @return a list of two: $plot is "gg" "ggmatrix" plotable and ggsavable object; $p.value is the table of correlation pvalues
+#' @return If return.pvalue=FALSE:"gg" "ggmatrix" plotable and ggsavable object; if TRUE: a list of two: $plot is the plot as when return.pvalue=FALSE; $p.value is the table of correlation pvalues
 #' @name ggpairs_custom
 #' @import ggplot2
 #' @import RColorBrewer
@@ -19,7 +20,7 @@
 #' @export
 ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
                            sig.col=c("white","thistle1","orchid1"),plot.it=FALSE,
-                           signif.cutoff=0.05,...){
+                           signif.cutoff=0.05,return.pvalue=FALSE,...){
   ####Define sub-plots.
   ####This is also the storage of functions can be used by ggpairs
   { ### For P-values
@@ -43,9 +44,9 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
       y <- data[,quo_name(mapping$y)]
       pvalue <- coef(summary(lm(y~x)))[2,4]
       # add pvalue to corrTable
-      corrTable[quo_name(mapping$x),quo_name(mapping$y)] <<- pvalue
-      corrTable[quo_name(mapping$y),quo_name(mapping$x)] <<- pvalue
-      fill=ifelse(pvalue>0.01,col[1],
+      ggpairs_custom_env$corrTable[quo_name(mapping$x),quo_name(mapping$y)] <- pvalue
+      ggpairs_custom_env$corrTable[quo_name(mapping$y),quo_name(mapping$x)] <- pvalue
+      fill=ifelse(pvalue>signif.cutoff,col[1],
                   colorRampPalette(col[2:3])(100)[scales::rescale(-log(pvalue),c(1,100),c(0,200))])
       #fill=ifelse(pvalue<0.01,col[3],ifelse(pvalue<0.001,col[2],col[1]))
       xrange = c(0, 1)
@@ -75,10 +76,11 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
         aov <- aov(f, data)
         pvalue <- summary(aov)[[1]][["Pr(>F)"]][1]
         # add pvalue to corrTable
-        corrTable[quo_name(mapping$x),quo_name(mapping$y)] <<- pvalue
-        corrTable[quo_name(mapping$y),quo_name(mapping$x)] <<- pvalue
+        ggpairs_custom_env$corrTable[quo_name(mapping$x),quo_name(mapping$y)] <- pvalue
+        ggpairs_custom_env$corrTable[quo_name(mapping$y),quo_name(mapping$x)] <- pvalue
         #fill=colorRampPalette(c(col))(10)[scales::rescale(aov.p,c(10,1),c(0,1))]
-        fill=ifelse(pvalue<0.01,col[3],ifelse(pvalue<0.05,col[2],col[1]))
+        fill=ifelse(pvalue>signif.cutoff,col[1],
+                    colorRampPalette(col[2:3])(100)[scales::rescale(-log(pvalue),c(1,100),c(0,200))])
         xrange = c(0, 1)
         yrange = c(0, 1)
         ggplot() + xlim(xrange) + ylim(yrange)+
@@ -105,10 +107,11 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
       } else f <- as.formula(paste0(quo_name(mapping$y),"~",quo_name(mapping$x)))
         pvalue <- kruskal.test(f,data)$p.value
         # add pvalue to corrTable
-        corrTable[quo_name(mapping$x),quo_name(mapping$y)] <<- pvalue
-        corrTable[quo_name(mapping$y),quo_name(mapping$x)] <<- pvalue
+        ggpairs_custom_env$corrTable[quo_name(mapping$x),quo_name(mapping$y)] <- pvalue
+        ggpairs_custom_env$corrTable[quo_name(mapping$y),quo_name(mapping$x)] <- pvalue
         #fill=colorRampPalette(c(col))(10)[scales::rescale(aov.p,c(10,1),c(0,1))]
-        fill=ifelse(pvalue<0.01,col[3],ifelse(pvalue<0.05,col[2],col[1]))
+        fill=fill=ifelse(pvalue>signif.cutoff,col[1],
+                         colorRampPalette(col[2:3])(100)[scales::rescale(-log(pvalue),c(1,100),c(0,200))])
         xrange = c(0, 1)
         yrange = c(0, 1)
         ggplot() + xlim(xrange) + ylim(yrange)+
@@ -134,10 +137,11 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
       options(workspace=2e9)
       pvalue <- p_fish.chi.t(data,quo_name(mapping$x),quo_name(mapping$y))
       # add pvalue to corrTable
-      corrTable[quo_name(mapping$x),quo_name(mapping$y)] <<- pvalue
-      corrTable[quo_name(mapping$y),quo_name(mapping$x)] <<- pvalue
+      ggpairs_custom_env$corrTable[quo_name(mapping$x),quo_name(mapping$y)] <- pvalue
+      ggpairs_custom_env$corrTable[quo_name(mapping$y),quo_name(mapping$x)] <- pvalue
       #fill=colorRampPalette(c(col))(10)[scales::rescale(pvalue,c(10,1),c(0,1))]
-      fill=ifelse(pvalue<0.01,col[3],ifelse(pvalue<0.05,col[2],col[1]))
+      fill=fill=ifelse(pvalue>signif.cutoff,col[1],
+                       colorRampPalette(col[2:3])(100)[scales::rescale(-log(pvalue),c(1,100),c(0,200))])
       xrange = c(0, 1)
       yrange = c(0, 1)
       ggplot() + xlim(xrange) + ylim(yrange)+
@@ -245,7 +249,9 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
 
   if(is.null(feat.plot)) feat.plot <- colnames(ggdf)
 
-  corrTable <- matrix(1,length(feat.plot),length(feat.plot),dimnames=list(feat.plot,feat.plot))
+  #create a dedicated environment to store the corrTable
+  ggpairs_custom_env <- new.env(parent=emptyenv())
+  ggpairs_custom_env$corrTable <- matrix(1,length(feat.plot),length(feat.plot),dimnames=list(feat.plot,feat.plot))
 
   p <- ggpairs(ggdf[,feat.plot],axisLabels="internal",
           upper=list(continuous =ggplot_lmPvalue,
@@ -254,7 +260,12 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
           lower=list(continuous = ggplot_lm,
                      combo=ggplot_violin,
                      discrete = ggplot_percBar),...)
-
   if(plot.it) print(p)
-  return(list(plot=p,p.value=corrTable))
+  #if requested for return.pvalue, plot it and calculate the p value while plotting
+  if(return.pvalue&!plot.it){
+    message("Plotting to generate the p-values")
+    dev.new()
+    print(p)
+    return(list(plot=p,p.value=ggpairs_custom_env$corrTable))
+  } else return(p)
 }
