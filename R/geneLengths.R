@@ -11,14 +11,16 @@
 #' @import GenomicFeatures
 #' @import GenomicRanges
 #' @import AnnotationDbi
-#' @import TxDb.Hsapiens.UCSC.hg19.knownGene
-#' @import org.Hs.eg.db
+#@import TxDb.Hsapiens.UCSC.hg19.knownGene
+#@import org.Hs.eg.db
 #' @name geneLengths
 NULL
 #' @rdname geneLengths
 #' @export
 # Get exon length based on gene symbols https://www.biostars.org/p/62583/
 hg19ExonLengths <- function(symbols){
+  require("org.Hs.eg.db")
+  require("TxDb.Hsapiens.UCSC.hg19.knownGene")
   symbols <- as.character(symbols)
   exons.db = exonsBy(TxDb.Hsapiens.UCSC.hg19.knownGene, by='gene')
   egs    = unlist(mget(symbols[ symbols %in% keys(org.Hs.egSYMBOL2EG) ],org.Hs.egSYMBOL2EG) )
@@ -33,6 +35,8 @@ hg19ExonLengths <- function(symbols){
 #' @export
 # Get cds length based on gene symbols
 hg19cdsLengths <- function(symbols){
+  require("org.Hs.eg.db")
+  require("TxDb.Hsapiens.UCSC.hg19.knownGene")
   symbols <- as.character(symbols)
   cds.db = cdsBy(TxDb.Hsapiens.UCSC.hg19.knownGene, by='gene')
   egs    = unlist(mget(symbols[ symbols %in% keys(org.Hs.egSYMBOL2EG) ],org.Hs.egSYMBOL2EG) )
