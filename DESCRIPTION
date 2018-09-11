@@ -1,10 +1,10 @@
 Package: cjbmisc
 Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
+Version: 0.0.0.9100
 Authors@R: person("Jianbin", "Chen", email = "chenjb618@gmail.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
 Depends: R (>= 3.4.1)
-Imports: AnnotationDbi,circlize,ComplexHeatmap,EnvStats,GenomicFeatures,GenomicRanges,GGally,ggfortify,gginnards,ggplot2,ggpubr,ggpubr,grid,org.Hs.eg.db,RColorBrewer,RColorBrewer,scales,survival,survminer,TxDb.Hsapiens.UCSC.hg19.knownGene,VennDiagram
+Imports: AnnotationDbi,circlize,ComplexHeatmap,EnvStats,GenomicFeatures,GenomicRanges,GGally,ggfortify,gginnards,ggplot2,ggpubr,ggpubr,grid,RColorBrewer,RColorBrewer,scales,survival,survminer,VennDiagram
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

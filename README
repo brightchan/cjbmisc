@@ -1,1 +1,5 @@
 This is a repo for my miscellaneous R functions.
+Need to manually install ‘org.Hs.eg.db’, ‘TxDb.Hsapiens.UCSC.hg19.knownGene’ from bioconductor, or some functions might not work. 
+source("https://bioconductor.org/biocLite.R")
+biocLite("org.Hs.eg.db")
+biocLite("TxDb.Hsapiens.UCSC.hg19.knownGene")
