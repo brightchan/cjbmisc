@@ -5,11 +5,12 @@
 #'   \item p_fish.chi.t: Try first use \code{\link[cjbmisc]{fish.t}} to get p value,\cr
 #'   if failed (usually due to too many catergories), then use \code{\link[cjbmisc]{chisq.t}} with popup warning.
 #'   \item p_aov.t: p-value from \code{\link[stats]{aov}}
-#'   \item p_krus: p-value from \code{\link[stats]{kruskal.test}}
+#'   \item p_ContDisc: p-value from \code{\link[stats]{t.test}},\code{\link[stats]{wilcox.test}},\code{\link[stats]{kruskal.test}}
 #'   \item p_lm: p-value of the coefficient from the univariate \code{\link[stats]{lm}}
 #' }
 #' @param df numeric dataframe
 #' @param v1,v2 character of the column name in the df
+#' @param method p_ContDisc: the test method to-be-used, can be t.test, kruskal.test or wilcox.test
 #' @param alt passing to alternative in \code{\link[stats]{fisher.test}}, should be one of "two.sided", "greater" or "less". You can specify just the initial letter. Only used in the 2 by 2 case.
 #' @param ws passing to workspace size in \code{\link[stats]{fisher.test}},  integer specifying the size of the workspace used in the network algorithm. In units of 4 bytes.
 #' @seealso \code{\link{chisq.t}}, \code{\link{fish.t}}, \code{\link[stats]{fisher.test}},\code{\link[stats]{chisq.test}},
@@ -37,11 +38,11 @@ p_aov.t <- function(df,v1,v2){
 }
 #' @rdname getPvalue
 #' @export
-p_krus <- function(df,v1,v2){
+p_ContDisc <- function(df,v1,v2,method="kruskal.test"){
   if (plyr::is.discrete(df[,v1]))
     f <- as.formula(paste0(v2,"~",v1)) else
       f <- as.formula(paste0(v1,"~",v2))
-    kruskal.test(f, df)$p.value
+    get(method)(f, df)$p.value
 }
 #' @rdname getPvalue
 #' @export

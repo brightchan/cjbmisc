@@ -49,10 +49,12 @@ plot_feat_subtype <- function(plotdf,subtype,feat.plot,cont.plot="boxplot",
   #   } else ylim <- c(min(dat,na.rm=TRUE),max(dat,na.rm=TRUE)+2*adj)
   #   return(c(ylim,adj)) #the bottom, the top of the plot, and the adj value
   # }) %>% setNames(feat.cont)
-
+  cat("Plotting: ")
   plot.list <- lapply(feat.plot,function(x){
+    cat(x)
     # Discrete
     if(x %in% feat.disc){
+      cat(":disc ")
       if (x %in% names(disc.col)) {
         col=disc.col[[x]]
       } else{
@@ -64,6 +66,7 @@ plot_feat_subtype <- function(plotdf,subtype,feat.plot,cont.plot="boxplot",
                         highlight.signif=highlight.signif,highlight.signif.col=highlight.signif.col,signif.cutoff=signif.cutoff)
     } else {
       # Continuous
+      cat(":cont ")
       #deprecated code
       {
         # if (cont.plot=="boxplot"){

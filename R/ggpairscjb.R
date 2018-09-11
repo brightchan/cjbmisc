@@ -11,6 +11,7 @@
 #' @param signif.cutoff cutoff point for significant p-value. A colored (sig.col[3]) frame will be shown to significant plots.
 #' @param plot.it if FALSE, no plot printed, only return the object. Use ggsave(plot=p$plot) to plot.
 #' @param return.pvalue whether to return a pvalue matrix. If yes, it has to plot it to generate the values (to a new device)
+#' @param verbose whether to show the plotting pairs for debugging
 #' @param ... pass to \code{\link[GGally]{ggpairs}}
 #' @return If return.pvalue=FALSE:"gg" "ggmatrix" plotable and ggsavable object; if TRUE: a list of two: $plot is the plot as when return.pvalue=FALSE; $p.value is the table of correlation pvalues
 #' @name ggpairs_custom
@@ -20,12 +21,13 @@
 #' @export
 ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
                            sig.col=c("white","thistle1","orchid1"),plot.it=FALSE,
-                           signif.cutoff=0.05,return.pvalue=FALSE,...){
+                           signif.cutoff=0.05,return.pvalue=FALSE,verbose=FALSE,...){
   ####Define sub-plots.
   ####This is also the storage of functions can be used by ggpairs
   { ### For P-values
     # Continuous
     ggplot_corr<- function(data, mapping, method="pearson",col=sig.col){
+      if(verbose) cat(paste0("U-",quo_name(mapping$x),":",quo_name(mapping$y)," "))
       x <- data[,quo_name(mapping$x)]
       y <- data[,quo_name(mapping$y)]
       cor <- cor(x, y, method = method,use="complete.obs")
@@ -40,6 +42,7 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
     }
 
     ggplot_lmPvalue <- function(data, mapping, col=sig.col){
+      if(verbose) cat(paste0("U-",quo_name(mapping$x),":",quo_name(mapping$y)," "))
       x <- data[,quo_name(mapping$x)]
       y <- data[,quo_name(mapping$y)]
       pvalue <- coef(summary(lm(y~x)))[2,4]
@@ -70,6 +73,7 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
     }
     # Contin + Discret
     ggplot_anova<- function(data, mapping,col=sig.col){
+      if(verbose) cat(paste0("U-",quo_name(mapping$x),":",quo_name(mapping$y)," "))
       if (plyr::is.discrete(data[,quo_name(mapping$y)])){
         f <- as.formula(paste0(quo_name(mapping$y),"~",quo_name(mapping$x)))
       } else f <- as.formula(paste0(quo_name(mapping$x),"~",quo_name(mapping$y)))
@@ -102,6 +106,7 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
     }
 
     ggplot_krus <- function(data, mapping,col=sig.col){
+      if(verbose) cat(paste0("U-",quo_name(mapping$x),":",quo_name(mapping$y)," "))
       if (plyr::is.discrete(data[,quo_name(mapping$y)])){
         f <- as.formula(paste0(quo_name(mapping$x),"~",quo_name(mapping$y)))
       } else f <- as.formula(paste0(quo_name(mapping$y),"~",quo_name(mapping$x)))
@@ -134,6 +139,7 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
 
     # Discret
     ggplot_FET<- function(data, mapping,col=sig.col){
+      if(verbose) cat(paste0("U-",quo_name(mapping$x),":",quo_name(mapping$y)," "))
       options(workspace=2e9)
       pvalue <- p_fish.chi.t(data,quo_name(mapping$x),quo_name(mapping$y))
       # add pvalue to corrTable
@@ -164,6 +170,7 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
 
     ### For actual plots
     ggplot_percBar <- function(data, mapping, col=colist){
+      if(verbose) cat(paste0("D-",quo_name(mapping$x),":",quo_name(mapping$y)," "))
       x <- quo_name(mapping$x)
       y <- quo_name(mapping$y)
       # Assign color
@@ -181,6 +188,7 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
     }
 
     ggplot_box <- function(data, mapping,col=colist){
+      if(verbose) cat(paste0("D-",quo_name(mapping$x),":",quo_name(mapping$y)," "))
       if (plyr::is.discrete(data[,quo_name(mapping$x)])){
         x <- quo_name(mapping$x)
         y <- quo_name(mapping$y)
@@ -196,6 +204,7 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
     }
 
     ggplot_violin <- function(data, mapping,col=colist){
+      if(verbose) cat(paste0("D-",quo_name(mapping$x),":",quo_name(mapping$y)," "))
       if (plyr::is.discrete(data[,quo_name(mapping$x)])){
         x <- quo_name(mapping$x)
         y <- quo_name(mapping$y)
@@ -212,6 +221,7 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
 
 
     ggplot_scatter <- function(data, mapping,col=comp_hm_colist_full$disc){
+      if(verbose) cat(paste0("D-",quo_name(mapping$x),":",quo_name(mapping$y)," "))
       ggplot(data,mapping)+
         geom_point(alpha = 1/2,color="green")+
         scale_fill_manual(values=col)+
@@ -220,11 +230,12 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
     }
 
     ggplot_lm <- function(data, mapping,col=comp_hm_colist_full$disc){
+      if(verbose) cat(paste0("D-",quo_name(mapping$x),":",quo_name(mapping$y)," "))
       x <- quo_name(mapping$x)
       y <- quo_name(mapping$y)
       p <- plot_lm(data,x,y,plot.it=FALSE,signif.cutoff=signif.cutoff)
       lab <- gsub(" ","\n",p$labels$caption)
-      p+annotate("text",label=lab, x=Inf, y = Inf,vjust=1.2,hjust=1.2,size=2.5)
+      p+annotate("text",label=lab, x=Inf, y = Inf,vjust=1.2,hjust=1.2,size=2.5,col="#00000093")
     }
 
     ggplot_headerblank <- function(data, mapping,col=NULL){

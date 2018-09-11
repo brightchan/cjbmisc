@@ -6,7 +6,7 @@
 \usage{
 ggpairs_custom(ggdf, feat.plot = NULL, colist = comp_hm_colist_full,
   sig.col = c("white", "thistle1", "orchid1"), plot.it = FALSE,
-  signif.cutoff = 0.05, return.pvalue = FALSE, ...)
+  signif.cutoff = 0.05, return.pvalue = FALSE, verbose = FALSE, ...)
 }
 \arguments{
 \item{ggdf}{dataframe with rows of samples and columns of features}
@@ -22,6 +22,8 @@ ggpairs_custom(ggdf, feat.plot = NULL, colist = comp_hm_colist_full,
 \item{signif.cutoff}{cutoff point for significant p-value. A colored (sig.col[3]) frame will be shown to significant plots.}
 
 \item{return.pvalue}{whether to return a pvalue matrix. If yes, it has to plot it to generate the values (to a new device)}
+
+\item{verbose}{whether to show the plotting pairs for debugging}
 
 \item{...}{pass to \code{\link[GGally]{ggpairs}}}
 }

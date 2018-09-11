@@ -25,7 +25,7 @@ violin(ggdf, x, y, test = "wilcox.test", title = NULL, col = NULL,
 boxjitter(...)
 
 plot_lm(ggdf, x, y, title = NULL, col = "#00DD006F", show.anno = TRUE,
-  plot.it = TRUE, highlight.signif = TRUE,
+  cor.method = "spearman", plot.it = TRUE, highlight.signif = TRUE,
   highlight.signif.col = "orchid1", signif.cutoff = 0.05, ...)
 }
 \arguments{
@@ -60,6 +60,8 @@ pvalue calculationg method: perc_barplot-\code{\link{p_fish.chi.t}}; violin-\cod
 
 \item{show.anno}{plot_lm: whether to show the R2, slope and slope p value}
 
+\item{cor.method}{plot_lm:the correlation method used for the annotation, pass to \code{\link[stats]{cor}}}
+
 \item{anno.hjust, anno.textsize}{violin:change the position and text size of the significance/count values}
 
 \item{pch}{plot_lm:dot style}
@@ -72,7 +74,8 @@ A group of functions for miscellaneous plots.
 \itemize{
   \item perc_barplot: Percentage barplot for two discrete values, showing the proportion of y in each x. fish or chisq test p value shown.
   \item violin: violin plot for one discrete and one continuous values. pvalue shown.
-  \item plot_lm: dot plot with lm regression line for two continuous values. Also show R2, p value of slope
+  \item boxjitter: same as violin plot, but show the data with a box plot and jitter points.
+  \item plot_lm: dot plot with lm regression line for two continuous values. Also show the correlation, R2, p value of slope
   \item violin_mul: plot multiple violin plot, but only the significant ones.
 }
 }

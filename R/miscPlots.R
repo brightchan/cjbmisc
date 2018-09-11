@@ -4,7 +4,8 @@
 #' \itemize{
 #'   \item perc_barplot: Percentage barplot for two discrete values, showing the proportion of y in each x. fish or chisq test p value shown.
 #'   \item violin: violin plot for one discrete and one continuous values. pvalue shown.
-#'   \item plot_lm: dot plot with lm regression line for two continuous values. Also show R2, p value of slope
+#'   \item boxjitter: same as violin plot, but show the data with a box plot and jitter points.
+#'   \item plot_lm: dot plot with lm regression line for two continuous values. Also show the correlation, R2, p value of slope
 #'   \item violin_mul: plot multiple violin plot, but only the significant ones.
 #' }
 #' @param ggdf,df dataframe with rows of samples and columns of features
@@ -24,6 +25,7 @@
 #'           pvalue calculationg method: perc_barplot-\code{\link{p_fish.chi.t}}; violin-\code{\link{p_krus}}; plot_lm-from the univariate \code{\link[stats]{lm}}
 #' @param pch plot_lm:dot style
 #' @param plot.it if FALSE, no plot printed, only return the plot object
+#' @param cor.method plot_lm:the correlation method used for the annotation, pass to \code{\link[stats]{cor}}
 #' @param ... in perc_barplot, violin, plot_lm: pass to \code{\link[ggplot2]{theme}}
 #' @return A ggplot object
 #' @name miscPlots
@@ -74,8 +76,8 @@ perc_barplot <- function(ggdf,x,y,title=NULL,col=comp_hm_colist_full$disc,
   if (highlight.signif&pvalue<signif.cutoff) p <- p +
     theme(panel.border=element_rect(linetype = "solid",fill=NA,colour=highlight.signif.col))
 
-  if(show.count) p <- p+geom_text(data=xcount,mapping=aes(x=Var1,y=-anno.vjust,vjust=0.5,label=Freq),size=anno.textsize)+
-    scale_y_continuous(labels=scales::percent,limits=c(-anno.vjust,1+anno.vjust),breaks=seq(0,1,0.25))
+  if(show.count) suppressMessages(p <- p+geom_text(data=xcount,mapping=aes(x=Var1,y=-anno.vjust,vjust=0.5,label=Freq),size=anno.textsize)+
+    scale_y_continuous(labels=scales::percent,limits=c(-anno.vjust,1+anno.vjust),breaks=seq(0,1,0.25)))
   if(plot.it) print(p)
   return(p)
 }
@@ -164,9 +166,12 @@ violin <- function(ggdf,x,y,test="wilcox.test",
   if (border) p <- p+theme(panel.border = element_rect(linetype = "solid",fill=NA))
 
   # Highlight significant plots with a color frame
-  pvalue <- p_krus(ggdf,x,y)
-  if (highlight.signif&pvalue<signif.cutoff) p <- p +
+
+  if (highlight.signif){
+    if(length(na.omit(unique(ggdf[,x])))==2) pvalue <- p_ContDisc(ggdf,x,y,method=test) else pvalue <- p_ContDisc(ggdf,x,y,method="kruskal.test")
+    if(pvalue<signif.cutoff) p <- p +
     theme(panel.border=element_rect(linetype = "solid",fill=NA,colour=highlight.signif.col))
+    }
 
   if (show.count) p <- p+stat_n_text(size=anno.textsize)
   if (show.mean) p <- p+stat_summary(fun.y=mean, geom="point", shape=19, size=2,color="green")
@@ -192,19 +197,22 @@ boxjitter <- function(...){
 #                       "\nSlope q = ",format(summary(fit)$coefficients[2,4], digits=2)))
 # }
 
-plot_lm <- function(ggdf,x,y,title=NULL,col="#00DD006F",show.anno=TRUE,plot.it=TRUE,
-                    highlight.signif=TRUE,highlight.signif.col="orchid1",signif.cutoff=0.05,...){
+plot_lm <- function(ggdf,x,y,title=NULL,col="#00DD006F",show.anno=TRUE,cor.method="spearman",
+                    plot.it=TRUE,highlight.signif=TRUE,
+                    highlight.signif.col="orchid1",signif.cutoff=0.05,...){
   fit <- lm(as.formula(paste0(y,"~",x)),ggdf)
   if(show.anno){
     anno <- paste0("R2=", format(summary(fit)$adj.r.squared, digits=2),
                   " Slope=", format(summary(fit)$coefficients[2,1], digits=2),
                   " Slope_p=",format(summary(fit)$coefficients[2,4], digits=2))
-  } else anno <- NULL
+    anno.cor <- paste0(cor.method,".cor=\n",signif(cor(ggdf[,x],ggdf[,y],method=cor.method,use="com"),2))
+  } else {anno <- NULL;anno.cor <- ""}
   p <- ggplot(ggdf,aes_string(x,y))+
     geom_point(alpha = 1/2,color="green")+
     scale_fill_manual(values=col)+
     labs(title=title,caption=anno)+
     geom_smooth(method=lm,fill="grey80")+
+    annotate("text",x=-Inf,y=Inf,label=anno.cor,hjust=-0.1,vjust=1.1,col="#00000093")+
     theme_minimal()+
     theme(...)
 
@@ -212,7 +220,6 @@ plot_lm <- function(ggdf,x,y,title=NULL,col="#00DD006F",show.anno=TRUE,plot.it=T
   pvalue <- summary(fit)$coefficients[2,4]
   if (highlight.signif&pvalue<signif.cutoff) p <- p +
     theme(panel.border=element_rect(linetype = "solid",fill=NA,colour=highlight.signif.col))
-
 
   if(plot.it) print(p)
   return(p)
