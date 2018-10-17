@@ -73,15 +73,27 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
     }
     # Contin + Discret
     ggplot_anova<- function(data, mapping,col=sig.col){
-      if(verbose) cat(paste0("U-",quo_name(mapping$x),":",quo_name(mapping$y)," "))
-      if (plyr::is.discrete(data[,quo_name(mapping$y)])){
-        f <- as.formula(paste0(quo_name(mapping$y),"~",quo_name(mapping$x)))
-      } else f <- as.formula(paste0(quo_name(mapping$x),"~",quo_name(mapping$y)))
+      x <- quo_name(mapping$x)
+      y <- quo_name(mapping$y)
+      if(verbose) cat(paste0("U-",x,":",y," "))
+
+      if (plyr::is.discrete(data[,y])){
+        f <- as.formula(paste0(y,"~",x))
+        disc.flag <- y
+      } else {
+        f <- as.formula(paste0(x,"~",y))
+        disc.flag <- x
+      }
+      if (length(levels(as.factor(data[,y])))==1){
+        message("Only ONE catergory for x axis. Returning p-value=1.")
+        pvalue <- 1
+      } else{
         aov <- aov(f, data)
         pvalue <- summary(aov)[[1]][["Pr(>F)"]][1]
+      }
         # add pvalue to corrTable
-        ggpairs_custom_env$corrTable[quo_name(mapping$x),quo_name(mapping$y)] <- pvalue
-        ggpairs_custom_env$corrTable[quo_name(mapping$y),quo_name(mapping$x)] <- pvalue
+        ggpairs_custom_env$corrTable[x,y] <- pvalue
+        ggpairs_custom_env$corrTable[y,x] <- pvalue
         #fill=colorRampPalette(c(col))(10)[scales::rescale(aov.p,c(10,1),c(0,1))]
         fill=ifelse(pvalue>signif.cutoff,col[1],
                     colorRampPalette(col[2:3])(100)[scales::rescale(-log(pvalue),c(1,100),c(0,200))])
@@ -106,14 +118,16 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
     }
 
     ggplot_krus <- function(data, mapping,col=sig.col){
-      if(verbose) cat(paste0("U-",quo_name(mapping$x),":",quo_name(mapping$y)," "))
-      if (plyr::is.discrete(data[,quo_name(mapping$y)])){
-        f <- as.formula(paste0(quo_name(mapping$x),"~",quo_name(mapping$y)))
-      } else f <- as.formula(paste0(quo_name(mapping$y),"~",quo_name(mapping$x)))
+      x <- quo_name(mapping$x)
+      y <- quo_name(mapping$y)
+      if(verbose) cat(paste0("U-",x,":",y," "))
+      if (plyr::is.discrete(data[,y])){
+        f <- as.formula(paste0(x,"~",y))
+      } else f <- as.formula(paste0(y,"~",x))
         pvalue <- kruskal.test(f,data)$p.value
         # add pvalue to corrTable
-        ggpairs_custom_env$corrTable[quo_name(mapping$x),quo_name(mapping$y)] <- pvalue
-        ggpairs_custom_env$corrTable[quo_name(mapping$y),quo_name(mapping$x)] <- pvalue
+        ggpairs_custom_env$corrTable[x,y] <- pvalue
+        ggpairs_custom_env$corrTable[y,x] <- pvalue
         #fill=colorRampPalette(c(col))(10)[scales::rescale(aov.p,c(10,1),c(0,1))]
         fill=fill=ifelse(pvalue>signif.cutoff,col[1],
                          colorRampPalette(col[2:3])(100)[scales::rescale(-log(pvalue),c(1,100),c(0,200))])
@@ -139,12 +153,17 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
 
     # Discret
     ggplot_FET<- function(data, mapping,col=sig.col){
-      if(verbose) cat(paste0("U-",quo_name(mapping$x),":",quo_name(mapping$y)," "))
+      x <- quo_name(mapping$x)
+      y <- quo_name(mapping$y)
+      if(verbose) cat(paste0("U-",x,":",y," "))
       options(workspace=2e9)
-      pvalue <- p_fish.chi.t(data,quo_name(mapping$x),quo_name(mapping$y))
+      if(length(levels(as.factor(data[,y])))==1){
+        pvalue <- 1
+        message("Only ONE catergory for y axis. Returning p-value=1.")
+      } else pvalue <- p_fish.chi.t(data,x,y)
       # add pvalue to corrTable
-      ggpairs_custom_env$corrTable[quo_name(mapping$x),quo_name(mapping$y)] <- pvalue
-      ggpairs_custom_env$corrTable[quo_name(mapping$y),quo_name(mapping$x)] <- pvalue
+      ggpairs_custom_env$corrTable[x,y] <- pvalue
+      ggpairs_custom_env$corrTable[y,x] <- pvalue
       #fill=colorRampPalette(c(col))(10)[scales::rescale(pvalue,c(10,1),c(0,1))]
       fill=fill=ifelse(pvalue>signif.cutoff,col[1],
                        colorRampPalette(col[2:3])(100)[scales::rescale(-log(pvalue),c(1,100),c(0,200))])
@@ -264,6 +283,8 @@ ggpairs_custom <- function(ggdf,feat.plot=NULL,colist=comp_hm_colist_full,
   ggpairs_custom_env <- new.env(parent=emptyenv())
   ggpairs_custom_env$corrTable <- matrix(1,length(feat.plot),length(feat.plot),dimnames=list(feat.plot,feat.plot))
 
+
+  # define how each plot art to be plotted
   p <- ggpairs(ggdf[,feat.plot],axisLabels="internal",
           upper=list(continuous =ggplot_lmPvalue,
                      combo = ggplot_krus,

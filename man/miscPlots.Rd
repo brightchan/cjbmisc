@@ -10,14 +10,15 @@
 \usage{
 perc_barplot(ggdf, x, y, title = NULL, col = comp_hm_colist_full$disc,
   xlab = x, ylab = y, width = 0.9, aspect.ratio = 1.4,
-  show.count = TRUE, anno.textsize = 4, anno.vjust = 0.04,
-  border = TRUE, plot.it = FALSE, highlight.signif = TRUE,
-  highlight.signif.col = "orchid1", signif.cutoff = 0.05, ...)
+  p.label = "p.format", p.symnum.args = list(), show.count = TRUE,
+  anno.textsize = 4, anno.vjust = 0.04, border = TRUE, plot.it = FALSE,
+  highlight.signif = TRUE, highlight.signif.col = "orchid1",
+  signif.cutoff = 0.05, ...)
 
 violin(ggdf, x, y, test = "wilcox.test", title = NULL, col = NULL,
   xlab = x, ylab = y, width = 0.9, aspect.ratio = 1.4,
-  show.mean = TRUE, show.count = TRUE, label = NULL,
-  symnum.args = list(), anno.vjust = 0.1, anno.textsize = 4,
+  show.mean = TRUE, show.count = TRUE, p.label = NULL,
+  p.symnum.args = list(), anno.vjust = 0.1, anno.textsize = 4,
   border = TRUE, plot.it = FALSE, highlight.signif = TRUE,
   highlight.signif.col = "orchid1", signif.cutoff = 0.05,
   plot.type = "violin", box.notch = FALSE, ...)
@@ -42,6 +43,8 @@ plot_lm(ggdf, x, y, title = NULL, col = "#00DD006F", show.anno = TRUE,
 \item{width}{perc_barplot & violin: with of the bar or violin}
 
 \item{aspect.ratio}{perc_barplot & violin:aspect ratio of the final plot}
+
+\item{p.label, p.symnum.args}{change the label style ("p.signif" or "p.format") of the significance. See label and symnum.args from \code{\link[ggpubr]{stat_compare_means}}}
 
 \item{show.count}{perc_barplot & violin:whether to show the total count of each catergory}
 
@@ -70,7 +73,8 @@ pvalue calculationg method: perc_barplot-\code{\link{p_fish.chi.t}}; violin-\cod
 A ggplot object
 }
 \description{
-A group of functions for miscellaneous plots.
+A group of functions for miscellaneous plots. These are the foundation of the plot_feat_subtype and ggpairs_custom\cr
+You may adjust via trial&error for the anno.hjust and anno.textsize parameter if the p-value text size and position are not good enough.
 \itemize{
   \item perc_barplot: Percentage barplot for two discrete values, showing the proportion of y in each x. fish or chisq test p value shown.
   \item violin: violin plot for one discrete and one continuous values. pvalue shown.

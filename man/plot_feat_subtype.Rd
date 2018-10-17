@@ -5,7 +5,7 @@
 \title{Plot multiple features of subtypes}
 \usage{
 plot_feat_subtype(plotdf, subtype, feat.plot, cont.plot = "boxplot",
-  cont.test = "wilcox.test", label = NULL, symnum.args = list(),
+  cont.test = "wilcox.test", p.label = NULL, p.symnum.args = list(),
   cont.show.mean = FALSE, show.count = TRUE,
   cont.col = comp_hm_colist_full$disc, disc.col = comp_hm_colist_full,
   disc.width = 0.8, cont.width = 0.9, disc.border = TRUE,
@@ -25,7 +25,7 @@ plot_feat_subtype(plotdf, subtype, feat.plot, cont.plot = "boxplot",
 
 \item{cont.test}{the test to be used for the significant test for continuous variables}
 
-\item{label, symnum.args}{change the label style ("p.signif" or "p.format") of the significance. See \code{\link[ggpubr]{stat_compare_means}}}
+\item{p.label, p.symnum.args}{change the label style ("p.signif" or "p.format") of the significance. See \code{\link[ggpubr]{stat_compare_means}}}
 
 \item{cont.show.mean}{boolean of whether to show the mean as a green dot for continuous variables}
 
@@ -51,7 +51,8 @@ plot_feat_subtype(plotdf, subtype, feat.plot, cont.plot = "boxplot",
 }
 \description{
 Plot percentage barplot or violin/boxplot for discrete or continuous variables of each subtype.
-Usage: p <- plot_feat_subtype(df,"Stage",c("Ploidy","Purity","EGFR","Smoker"))\cr
-then ggpubr::ggarrange(plotlist=p,nrow=y,ncol=x,align="hv")
-Return a list of ggplots that can be arranged into figure panel with \code{\link[ggpubr]{ggarrange}}.
+Return a list of ggplots that can be arranged into figure panel with \code{\link[ggpubr]{ggarrange}}.\cr
+Usage: plist <- plot_feat_subtype(df,"Stage",c("Ploidy","Purity","EGFR","Smoker"))\cr
+then p <- ggpubr::ggarrange(plotlist=plist,align="hv")\cr
+ggsave("file.pdf",p)
 }

@@ -39,9 +39,13 @@ p_aov.t <- function(df,v1,v2){
 #' @rdname getPvalue
 #' @export
 p_ContDisc <- function(df,v1,v2,method="kruskal.test"){
-  if (plyr::is.discrete(df[,v1]))
-    f <- as.formula(paste0(v2,"~",v1)) else
-      f <- as.formula(paste0(v1,"~",v2))
+  if (plyr::is.discrete(df[,v1])){
+    df[,v1] <- as.factor(df[,v1])
+    f <- as.formula(paste0(v2,"~",v1))
+  } else{
+    df[,v2] <- as.factor(df[,v2])
+    f <- as.formula(paste0(v1,"~",v2))
+  }
     get(method)(f, df)$p.value
 }
 #' @rdname getPvalue

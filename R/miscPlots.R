@@ -1,6 +1,7 @@
 #' Miscellaneous plotting functions
 #'
-#' A group of functions for miscellaneous plots.
+#' A group of functions for miscellaneous plots. These are the foundation of the plot_feat_subtype and ggpairs_custom\cr
+#' You may adjust via trial&error for the anno.hjust and anno.textsize parameter if the p-value text size and position are not good enough.
 #' \itemize{
 #'   \item perc_barplot: Percentage barplot for two discrete values, showing the proportion of y in each x. fish or chisq test p value shown.
 #'   \item violin: violin plot for one discrete and one continuous values. pvalue shown.
@@ -23,6 +24,7 @@
 #' @param box.notch violin/boxjitter: whether show notch style box plot
 #' @param highlight.signif,highlight.signif.col,signif.cutoff Whether to highlight (highlight.signif) a significant plot with a color border (highlight.signif.col) according to the p-value cutoff (signif.cutoff).\cr
 #'           pvalue calculationg method: perc_barplot-\code{\link{p_fish.chi.t}}; violin-\code{\link{p_krus}}; plot_lm-from the univariate \code{\link[stats]{lm}}
+#' @param p.label,p.symnum.args change the label style ("p.signif" or "p.format") of the significance. See label and symnum.args from \code{\link[ggpubr]{stat_compare_means}}
 #' @param pch plot_lm:dot style
 #' @param plot.it if FALSE, no plot printed, only return the plot object
 #' @param cor.method plot_lm:the correlation method used for the annotation, pass to \code{\link[stats]{cor}}
@@ -33,23 +35,40 @@ NULL
 #' @rdname miscPlots
 #' @export
 #' @import ggplot2
+#' @import stats
 #' @importFrom scales percent
 #Percentage Barplot
 perc_barplot <- function(ggdf,x,y,title=NULL,col=comp_hm_colist_full$disc,
                          xlab=x,ylab=y,width=0.9,aspect.ratio=1.4,
+                         p.label="p.format",p.symnum.args=list(),
                          show.count=TRUE,anno.textsize=4,anno.vjust=0.04,border=TRUE,plot.it=FALSE,
                          highlight.signif=TRUE,highlight.signif.col="orchid1",signif.cutoff=0.05,...){
   ggdf[,x] <- droplevels(as.factor(ggdf[,x]))
   #remove NA
   ggdf <- ggdf[complete.cases(ggdf[,y]),]
+  #get the levels of y
+  lel <- levels(as.factor(ggdf[,y]))
   # Set names to color according to level of y
   if(is.null(names(col))|!all(levels(as.factor(ggdf[,y]))%in%names(col))){
     #message("Assigning color based on level order.")
-    lel <- levels(as.factor(ggdf[,y]))
     col <- setNames(col[1:length(lel)],lel)
   }
   xcount <- table(ggdf[,x]) %>% as.data.frame() %>% mutate(Freq=paste0("n=",Freq),!!y:=NA)
-  pvalue <- p_fish.chi.t(ggdf,x,y)
+  # If y only has one level, return p-value=1
+  if(length(lel)==1){
+    pvalue <- 1
+    message("Only ONE catergory for y axis. Returning p-value=1.")
+    } else pvalue <- p_fish.chi.t(ggdf,x,y)
+
+  # Change p value format
+  if(p.label=="p.signif") {
+    if(length(p.symnum.args)==0) {
+      pvalue <- symnum(pvalue,cutpoints=c(0, 0.0001, 0.001, 0.01, 0.05, 1),
+                       symbols=c("****", "***", "**", "*", "ns"))
+    } else pvalue <- symnum(pvalue,cutpoints=p.symnum.args[[1]],
+                            symbols=p.symnum.args[[2]])
+  } else {pvalue <- signif(pvalue,2)}
+
   df <- as.matrix(prop.table(xtabs(as.formula(paste0("~",x,"+",y)),data=ggdf),1))
   df <- data.frame(df)
   p <- ggplot(df,aes_string(x,"Freq",fill=y))+
@@ -57,7 +76,7 @@ perc_barplot <- function(ggdf,x,y,title=NULL,col=comp_hm_colist_full$disc,
     scale_y_continuous(labels=scales::percent,limits=c(0,1+anno.vjust),breaks=seq(0,1,0.25))+
     ggtitle(title)+
     labs(x=xlab,y=ylab)+
-    annotation_custom(grid::textGrob(paste0("p=",signif(pvalue,2)),gp = grid::gpar(fontsize = 3*anno.textsize)),
+    annotation_custom(grid::textGrob(paste0("p=",pvalue),gp = grid::gpar(fontsize = 3*anno.textsize)),
                       xmin = -Inf, xmax = Inf,ymin=1+1.5*anno.vjust,ymax=1+anno.vjust)+
     #guides(fill=F)+
     guides(fill=guide_legend(title=y))+
@@ -93,7 +112,7 @@ violin <- function(ggdf,x,y,test="wilcox.test",
                    title=NULL,col=NULL,xlab=x,ylab=y,
                    width=0.9,aspect.ratio=1.4,
                    show.mean=TRUE,show.count=TRUE,
-                   label=NULL,symnum.args=list(),
+                   p.label=NULL,p.symnum.args=list(),
                    anno.vjust=0.1,anno.textsize=4,
                    border=TRUE,plot.it=FALSE,
                    highlight.signif=TRUE,highlight.signif.col="orchid1",signif.cutoff=0.05,
@@ -146,7 +165,7 @@ violin <- function(ggdf,x,y,test="wilcox.test",
   if (length(na.omit(unique(ggdf[,x])))==2){
     p <- p+ylim(ylim)+
       stat_compare_means(comparisons=list(c(1,2)),method=test,
-                         symnum.args=symnum.args,label=label,
+                         p.symnum.args=p.symnum.args,label=p.label,
                          label.y=c(ylim[2]-0.5*adj))
     #geom_signif(comparisons=list(c(1,2)),test=test,textsize=anno.textsize,
     #            y_position=c(ylim[2]-0.5*adj))
@@ -154,7 +173,7 @@ violin <- function(ggdf,x,y,test="wilcox.test",
   } else if (length(na.omit(unique(ggdf[,x])))==3){
     p <- p+ylim(ylim)+
       stat_compare_means(comparisons=list(c(1,2),c(2,3),c(1,3)),method=test,
-                         symnum.args=symnum.args,label=label,
+                         p.symnum.args=p.symnum.args,label=p.label,
                          label.y=c(ylim[2]-1.4*adj,ylim[2]-1.4*adj,ylim[2]-0.45*adj))
     p$layers[[which_layers(p, "GeomSignif")]]$aes_params$textsize <- anno.textsize
   } else p <- p+stat_compare_means(method="kruskal.test",
@@ -166,6 +185,7 @@ violin <- function(ggdf,x,y,test="wilcox.test",
   if (border) p <- p+theme(panel.border = element_rect(linetype = "solid",fill=NA))
 
   # Highlight significant plots with a color frame
+  ggdf[,x] <- as.factor(ggdf[,x])
 
   if (highlight.signif){
     if(length(na.omit(unique(ggdf[,x])))==2) pvalue <- p_ContDisc(ggdf,x,y,method=test) else pvalue <- p_ContDisc(ggdf,x,y,method="kruskal.test")
@@ -174,7 +194,7 @@ violin <- function(ggdf,x,y,test="wilcox.test",
     }
 
   if (show.count) p <- p+stat_n_text(size=anno.textsize)
-  if (show.mean) p <- p+stat_summary(fun.y=mean, geom="point", shape=19, size=2,color="green")
+  if (show.mean) p <- p+stat_summary(fun.y=mean, geom="point", shape=19, size=1.5,color="#22DD2290")
   if(plot.it) print(p)
   return(p)
 }
