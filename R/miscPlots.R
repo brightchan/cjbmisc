@@ -117,7 +117,7 @@ violin <- function(ggdf,x,y,test="wilcox.test",
                    border=TRUE,plot.it=FALSE,
                    highlight.signif=TRUE,highlight.signif.col="orchid1",signif.cutoff=0.05,
                    plot.type="violin",box.notch=FALSE,...){
-  dat <- ggdf[,y]
+  dat <- ggdf[!is.na(ggdf[,x]),y]
   spr <- max(dat,na.rm=TRUE)-min(dat,na.rm=TRUE) #spread
   adj <- spr*anno.vjust # unit of adjustment as anno.vjust of the spread
   # Adjust annotation position
