@@ -10,7 +10,8 @@
 #' @param subtype column name of the subtype
 #' @param feat.plot character vector of the features to be plotted
 #' @param cont.plot character of either "boxplot" or "violin"
-#' @param cont.test the test to be used for the significant test for continuous variables
+#' @param cont.test the significance test to be used for continuous variables. Use the name of the r basic tests.
+#' @param disc.test the significance test to be used for discrete variables. Should be "fisher","chi" or"both"
 #' @param cont.show.mean boolean of whether to show the mean as a green dot for continuous variables
 #' @param show.count whether to show the total count of each catergory
 #' @param disc.col list of named vectors for colors of discrete variables
@@ -22,6 +23,7 @@
 #' @param p.label,p.symnum.args change the label style ("p.signif" or "p.format") of the significance. See \code{\link[ggpubr]{stat_compare_means}}
 #' @param anno.textsize change text size of the significance values
 #' @param highlight.signif,highlight.signif.col,signif.cutoff Whether to highlight (highlight.signif) a significant plot with a color border (highlight.signif.col) according to the p-value cutoff (signif.cutoff). See \code{\link{miscPlots}}
+#' @param plot.signif.only whether to plot only the significant items
 #' @param ... pass to \code{\link[ggplot2]{theme}} for each individual plot
 #' @name plot_feat_subtype
 #' @import ggplot2
@@ -30,25 +32,27 @@
 #' @importFrom gginnards which_layers
 #' @export
 plot_feat_subtype <- function(plotdf,subtype,feat.plot,cont.plot="boxplot",
-                              cont.test="wilcox.test",p.label=NULL,p.symnum.args=list(),
+                              cont.test="wilcox.test",disc.test="both",
+                              p.label=NULL,p.symnum.args=list(),
                               cont.show.mean=FALSE,show.count=TRUE,
                               cont.col=comp_hm_colist_full$disc,disc.col=comp_hm_colist_full,
                               disc.width=0.8,cont.width=0.9,
                               disc.border=TRUE,cont.border=TRUE,
                               anno.textsize=4,cont.anno.vjust=0.2,disc.anno.vjust=0.04,
                               aspect.ratio=1.4,legend.position="bottom",
-                              highlight.signif=TRUE,highlight.signif.col="red",signif.cutoff=0.05,...){
+                              highlight.signif=TRUE,highlight.signif.col="red",signif.cutoff=0.05,
+                              plot.signif.only=F,...){
 
   feat.disc <- colnames(plotdf)[sapply(plotdf,function(x)!is.numeric(x))]
   feat.cont <- colnames(plotdf)[sapply(plotdf,function(x)is.numeric(x))]
 
 
-  cat("Plotting: ")
+  message("Plotting: ")
   plot.list <- lapply(feat.plot,function(x){
-    cat(x)
+    message(x)
     # Discrete
     if(x %in% feat.disc){
-      cat(":disc ")
+      message(":disc ")
       if (x %in% names(disc.col)) {
         col=disc.col[[x]]
       } else{
@@ -60,7 +64,7 @@ plot_feat_subtype <- function(plotdf,subtype,feat.plot,cont.plot="boxplot",
                         highlight.signif=highlight.signif,highlight.signif.col=highlight.signif.col,signif.cutoff=signif.cutoff,...)
     } else {
       # Continuous
-      cat(":cont ")
+      message(":cont ")
       #deprecated code
       {
         # if (cont.plot=="boxplot"){
@@ -119,5 +123,11 @@ plot_feat_subtype <- function(plotdf,subtype,feat.plot,cont.plot="boxplot",
             ...)
     return(p)
   })
-  setNames(plot.list,feat.plot)
+  plot.list <- setNames(plot.list,feat.plot)
+  if(plot.signif.only){
+    pvlaue <- p_feat_subtype(plotdf,subtype,feat.plot,cont.test=cont.test,disc.test=disc.test)
+    return(plot.list[pvlaue<signif.cutoff])
+  }else{
+    return(plot.list)
+  }
 }

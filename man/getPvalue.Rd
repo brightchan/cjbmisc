@@ -6,15 +6,19 @@
 \alias{p_aov.t}
 \alias{p_ContDisc}
 \alias{p_lm}
+\alias{p_feat_subtype}
 \title{Returning only the p values}
 \usage{
-p_fish.chi.t(df, v1, v2, alt = "two.sided", ws = 2e+06)
+p_fish.chi.t(df, v1, v2, alt = "two.sided", p.test = "both", ws = 2e+06)
 
 p_aov.t(df, v1, v2)
 
 p_ContDisc(df, v1, v2, method = "kruskal.test")
 
 p_lm(df, v1, v2)
+
+p_feat_subtype(df, subtype, feat, cont.test = "kruskal.test",
+  disc.test = "both", ...)
 }
 \arguments{
 \item{df}{numeric dataframe}
@@ -23,18 +27,34 @@ p_lm(df, v1, v2)
 
 \item{alt}{passing to alternative in \code{\link[stats]{fisher.test}}, should be one of "two.sided", "greater" or "less". You can specify just the initial letter. Only used in the 2 by 2 case.}
 
+\item{p.test}{Should be "fisher" or "chi", to use only that method to get p values.}
+
 \item{ws}{passing to workspace size in \code{\link[stats]{fisher.test}},  integer specifying the size of the workspace used in the network algorithm. In units of 4 bytes.}
 
 \item{method}{p_ContDisc: the test method to-be-used, can be t.test, kruskal.test or wilcox.test}
+
+\item{subtype}{column name of the subtype}
+
+\item{feat}{character vector of the features to be calculated}
+
+\item{cont.test}{the significance test to be used for continuous variables. Use the name of the r basic tests.}
+
+\item{disc.test}{the significance test to be used for discrete variables. Should be "fisher","chi" or"both"}
+
+\item{...}{for p_feat_subtype, pass to \code{\link[cjbmisc]{p_fish.chi.t}}}
+
+\item{df}{dataframe with rows of samples and columns of features, one column should contain the subtype info.}
 }
 \description{
 A group of functions to return only the p values from various of tests.
 \itemize{
   \item p_fish.chi.t: Try first use \code{\link[cjbmisc]{fish.t}} to get p value,\cr
-  if failed (usually due to too many catergories), then use \code{\link[cjbmisc]{chisq.t}} with popup warning.
+  if failed (usually due to too many catergories), then use \code{\link[cjbmisc]{chisq.t}} with popup warning. \cr
+  If only Fisher's exact test or ChiSQ is wanted, specify it in "p.test" parameter
   \item p_aov.t: p-value from \code{\link[stats]{aov}}
   \item p_ContDisc: p-value from \code{\link[stats]{t.test}},\code{\link[stats]{wilcox.test}},\code{\link[stats]{kruskal.test}}
   \item p_lm: p-value of the coefficient from the univariate \code{\link[stats]{lm}}
+  \item p_feat_subtype: p-value of a set of features according to a subtype in a manner similar to \code{\link[cjbmisc]{plot_feat_subtype}}
 }
 }
 \seealso{

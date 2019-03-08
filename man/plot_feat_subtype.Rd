@@ -5,14 +5,14 @@
 \title{Plot multiple features of subtypes}
 \usage{
 plot_feat_subtype(plotdf, subtype, feat.plot, cont.plot = "boxplot",
-  cont.test = "wilcox.test", p.label = NULL, p.symnum.args = list(),
-  cont.show.mean = FALSE, show.count = TRUE,
+  cont.test = "wilcox.test", disc.test = "both", p.label = NULL,
+  p.symnum.args = list(), cont.show.mean = FALSE, show.count = TRUE,
   cont.col = comp_hm_colist_full$disc, disc.col = comp_hm_colist_full,
   disc.width = 0.8, cont.width = 0.9, disc.border = TRUE,
   cont.border = TRUE, anno.textsize = 4, cont.anno.vjust = 0.2,
   disc.anno.vjust = 0.04, aspect.ratio = 1.4, legend.position = "bottom",
   highlight.signif = TRUE, highlight.signif.col = "red",
-  signif.cutoff = 0.05, ...)
+  signif.cutoff = 0.05, plot.signif.only = F, ...)
 }
 \arguments{
 \item{plotdf}{dataframe with rows of samples and columns of features, one column should contain the subtype info.}
@@ -23,7 +23,9 @@ plot_feat_subtype(plotdf, subtype, feat.plot, cont.plot = "boxplot",
 
 \item{cont.plot}{character of either "boxplot" or "violin"}
 
-\item{cont.test}{the test to be used for the significant test for continuous variables}
+\item{cont.test}{the significance test to be used for continuous variables. Use the name of the r basic tests.}
+
+\item{disc.test}{the significance test to be used for discrete variables. Should be "fisher","chi" or"both"}
 
 \item{p.label, p.symnum.args}{change the label style ("p.signif" or "p.format") of the significance. See \code{\link[ggpubr]{stat_compare_means}}}
 
@@ -46,6 +48,8 @@ plot_feat_subtype(plotdf, subtype, feat.plot, cont.plot = "boxplot",
 \item{legend.position}{position of the legends}
 
 \item{highlight.signif, highlight.signif.col, signif.cutoff}{Whether to highlight (highlight.signif) a significant plot with a color border (highlight.signif.col) according to the p-value cutoff (signif.cutoff). See \code{\link{miscPlots}}}
+
+\item{plot.signif.only}{whether to plot only the significant items}
 
 \item{...}{pass to \code{\link[ggplot2]{theme}} for each individual plot}
 }

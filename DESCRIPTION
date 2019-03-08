@@ -1,6 +1,6 @@
 Package: cjbmisc
 Title: What the Package Does (one line, title case)
-Version: 0.0.0.9100
+Version: 0.9.00
 Authors@R: person("Jianbin", "Chen", email = "chenjb618@gmail.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
 Depends: R (>= 3.4.1)
