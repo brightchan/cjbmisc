@@ -77,7 +77,7 @@ p_feat_subtype <- function(df,subtype,feat,
                               disc.test="both",...){
   df <- df[,c(subtype,feat)]
 
-  feat.disc <- feat[sapply(df,function(x)!is.numeric(x))]
+  feat.disc <- feat[sapply(df[,feat],function(x)!is.numeric(x))]
   #feat.cont <- colnames(df)[sapply(df,function(x)is.numeric(x))]
 
   p.list <- sapply(feat,function(x){
