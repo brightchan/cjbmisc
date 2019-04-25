@@ -23,11 +23,7 @@ maf2oncoprintdf(inpmaf, gene = NULL, ordergene = FALSE, coding = TRUE,
 
 \item{subtypeOrder}{named character of the subtype info of the patients. If provided, the oncodf would be ordered by this subtype info.}
 
-\item{outp}{character of output folder and file name}
-
-\item{w, h}{width and height of the output plot}
-
-\item{colist}{the comprehensive color list.\cr By default it is comp_hm_colist_full loaded in this package}
+\item{subtypeOrder}{a cha vector specifying the subtype of the samples, the oncodf will be ordered by subtype first.}
 }
 \value{
 a plot saved in desinated path

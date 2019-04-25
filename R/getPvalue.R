@@ -90,4 +90,14 @@ p_feat_subtype <- function(df,subtype,feat,
   setNames(p.list,feat)
 }
 
+p_adjust_mat <- function(pvaldf, p.adjust.method = "BH") {
 
+  pvec <- as.vector(pvaldf)
+  nai <- is.na(pvec)
+  qvec <- rep(NA, length(pvec))
+  qvec[!nai] <- p.adjust(pvec[!nai], method = p.adjust.method)
+  qmat <- matrix(qvec, nrow = nrow(pvaldf))
+  dimnames(qmat) <- dimnames(pvaldf)
+  qmat
+
+}

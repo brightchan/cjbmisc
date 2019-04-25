@@ -11,9 +11,7 @@
 #' @param coding boolean for whether to subset only the coding mutations
 #' @param noSilent boolean for whether to remove the silent mutations
 #' @param mergeVariant boolean for whether to merge the "Del and Ins" to "Indel" and various mutations to "Translation_Start_Site"
-#' @param outp character of output folder and file name
-#' @param w,h width and height of the output plot
-#' @param colist the comprehensive color list.\cr By default it is comp_hm_colist_full loaded in this package
+#' @param subtypeOrder a cha vector specifying the subtype of the samples, the oncodf will be ordered by subtype first.
 #' @return a plot saved in desinated path
 #' @seealso \code{\link[ComplexHeatmap]{oncoPrint}}
 #' @name oncoprint
@@ -24,7 +22,8 @@ NULL
 #' @importFrom circlize colorRamp2
 #' @importFrom RColorBrewer brewer.pal
 #
-maf2oncoprintdf <- function(inpmaf,gene=NULL,ordergene=FALSE,coding=TRUE,noSilent=FALSE,mergeVariant=TRUE,subtypeOrder=NULL){
+maf2oncoprintdf <- function(inpmaf,gene=NULL,ordergene=FALSE,coding=TRUE,
+                            noSilent=FALSE,mergeVariant=TRUE,subtypeOrder=NULL){
   # subset by gene name
   if(!is.null(gene)) inpmaf <- inpmaf[inpmaf$Hugo_Symbol%in%gene,]
   # subset only coding mutations

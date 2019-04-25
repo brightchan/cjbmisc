@@ -8,6 +8,8 @@
 \alias{cv}
 \alias{perm}
 \alias{consistSymbol}
+\alias{strGrep}
+\alias{gsub_multi}
 \title{Miscellaneous functions}
 \usage{
 dist_cos(a, b)
@@ -21,6 +23,14 @@ cv(x)
 perm(n)
 
 consistSymbol(a, r)
+
+strGrep(query, target, vectorout = F, ...)
+
+gsub_multi(df, column = "Variant_Classification",
+  sub = list(Translation_Start_Site = c("De_novo_Start_InFrame",
+  "De_novo_Start_OutOfFrame", "Start_Codon_Del", "Start_Codon_SNP"),
+  Frame_Shift_Indel = c("Frame_Shift_Del", "Frame_Shift_Ins"), In_Frame_Indel =
+  c("In_Frame_Ins", "In_Frame_Del")))
 }
 \arguments{
 \item{a, b, x, r}{numeric vector. r for reference}
@@ -30,6 +40,16 @@ consistSymbol(a, r)
 \item{multi}{when TRUE, return a vector when multiple outcome are possible; when FALSE, only output the first one of them.}
 
 \item{n}{integer}
+
+\item{query, target}{vectors of the query and target for the grep}
+
+\item{vectorout}{if TRUE, the return the first match of each item in the query, thus the output is a vector, not a list.}
+
+\item{df}{dataframe}
+
+\item{column}{the column to be targeted by gsub}
+
+\item{sub}{the list with names as the replacement and the content as the matching items}
 }
 \description{
 A group of functions for miscellaneous usage.
@@ -40,5 +60,7 @@ A group of functions for miscellaneous usage.
   return a single numeric value or multiple values when \emph{multi==TRUE}
   \item perm: permutation of 1:n sequence
   \item consistSymbol: Force a integer vector to use numbers match best with another vector
+  \item strGrep: use a vector as the input of grep, return a list of the matching index for each item in the query vector.
+  \item gsub_multi: gsub a column of a df based on a list of criteria
 }
 }

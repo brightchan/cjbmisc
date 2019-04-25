@@ -47,12 +47,12 @@ plot_feat_subtype <- function(plotdf,subtype,feat.plot,cont.plot="boxplot",
   feat.cont <- colnames(plotdf)[sapply(plotdf,function(x)is.numeric(x))]
 
 
-  message("Plotting: ")
+  message("Plotting: ",appendLF=F)
   plot.list <- lapply(feat.plot,function(x){
-    message(x)
+    message(x,appendLF=F)
     # Discrete
     if(x %in% feat.disc){
-      message(":disc ")
+      message(":disc ",appendLF=F)
       if (x %in% names(disc.col)) {
         col=disc.col[[x]]
       } else{
@@ -64,7 +64,7 @@ plot_feat_subtype <- function(plotdf,subtype,feat.plot,cont.plot="boxplot",
                         highlight.signif=highlight.signif,highlight.signif.col=highlight.signif.col,signif.cutoff=signif.cutoff,...)
     } else {
       # Continuous
-      message(":cont ")
+      message(":cont ",appendLF=F)
       #deprecated code
       {
         # if (cont.plot=="boxplot"){
