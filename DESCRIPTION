@@ -4,9 +4,9 @@ Version: 0.9.00
 Authors@R: person("Jianbin", "Chen", email = "chenjb618@gmail.com", role = c("aut", "cre"))
 Description: Miscellaneous functions for plotting and genomics by CJB.
 Depends: R (>= 3.4.1)
-Imports: circlize,EnvStats,GGally,ggfortify,gginnards,ggplot2,ggpubr,ggpubr,grid,RColorBrewer,RColorBrewer,scales,survival,survminer,VennDiagram
+Imports: circlize,EnvStats,GGally,ggfortify,gginnards,ggplot2,ggpubr,ggpubr,grid,RColorBrewer,RColorBrewer,scales,survival,survminer,VennDiagram,AnnotationDbi,org.Hs.eg.db,TxDb.Hsapiens.UCSC.hg19.knownGene,ComplexHeatmap,GenomicFeatures,GenomicRanges
 Suggests: 
-biocViews: AnnotationDbi,org.Hs.eg.db,TxDb.Hsapiens.UCSC.hg19.knownGene,ComplexHeatmap,GenomicFeatures,GenomicRanges
+biocViews: 
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
