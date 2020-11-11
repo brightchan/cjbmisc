@@ -93,6 +93,7 @@ colpal2=c("deepskyblue3","ivory","coral") #for heatmap
 #' @export
 # complex heatmap color list
 comp_hm_colist_full <- list(
+  Cohort=setNames(c("lemonchiffon","lightcyan"),c("Asian","Caucasian")),
   Smoker=c("No"="#E1FFE0","Yes"="lightsteelblue4"),
   Gender=c("Female"="mistyrose","Male"="skyblue3"),
   GenderSmoker=c("mistyrose","mistyrose3","skyblue","skyblue3"),

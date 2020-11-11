@@ -81,13 +81,17 @@ consistSymbol <- function(a,r){#a,r:numeric factor vector;r:ref
 #' @rdname cjb.misc
 #' @export
 #grep a vector from another vector, return a list
-strGrep <- function(query,target,vectorout=F,...){
+
+strGrep <- function(query,target,fixed=TRUE,vectorout=FALSE,...){
   outp <- lapply(query,function(x){
-    grep(x,target,fixed,...)
+    grep(x,target,fixed=fixed,...)
   })
-  if(vectorout) outp <- sapply(outp, "[[",1)
+  if(vectorout) outp <- lapply(outp,function(x){
+    if(length(x)==0) return(NA) else return(x)
+  }) %>% sapply("[[",1)
   return(outp)
 }
+
 #' @rdname cjb.misc
 #' @export
 # gsub a column of a df based on a list of criteria

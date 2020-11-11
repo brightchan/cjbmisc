@@ -4,8 +4,16 @@
 \alias{venn}
 \title{Venn diagram plotting functions}
 \usage{
-venn(l, n = NULL, title = NULL, filename = NULL, fill = NULL,
-  dist = 0.08, mar = 0.1, ...)
+venn(
+  l,
+  n = NULL,
+  title = NULL,
+  filename = NULL,
+  fill = NULL,
+  dist = 0.08,
+  mar = 0.1,
+  ...
+)
 }
 \arguments{
 \item{l}{list of vectors to be drawn. for named list the names would be the label}

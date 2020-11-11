@@ -29,7 +29,8 @@ NULL
 # PCA plot. Input data.frame of countdata, vector of subtype and diff as in coldata for the htmap
 pca <- function(df,A,B=NULL,title="PCA",col=colpal,
                 nameA="subtypeA",nameB="subtypeB",
-                point.size=4,shapes=c(16:18,15),plot.it=TRUE){
+                point.size=4,shapes=c(16:18,15),
+                plot.it=TRUE,return.data=FALSE){
   pr <- prcomp(df)
   perc <- round((pr$sdev)^2 / sum(pr$sdev^2)*100,digits=2) #Percentage of each PC
   if(is.null(B)){
@@ -56,8 +57,12 @@ pca <- function(df,A,B=NULL,title="PCA",col=colpal,
       scale_shape_manual(values=shapes)
   }
   if(plot.it) print(p)
+  if(return.data)return(list(p=p,pr=pr,perc=perc))
   return(p)
 }
+
+
+
 #' @rdname PCAPlots
 #' @export
 # Multiple PCA plots for top PCs ####

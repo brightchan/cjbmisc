@@ -24,13 +24,16 @@ perm(n)
 
 consistSymbol(a, r)
 
-strGrep(query, target, vectorout = F, ...)
+strGrep(query, target, fixed = TRUE, vectorout = FALSE, ...)
 
-gsub_multi(df, column = "Variant_Classification",
+gsub_multi(
+  df,
+  column = "Variant_Classification",
   sub = list(Translation_Start_Site = c("De_novo_Start_InFrame",
-  "De_novo_Start_OutOfFrame", "Start_Codon_Del", "Start_Codon_SNP"),
-  Frame_Shift_Indel = c("Frame_Shift_Del", "Frame_Shift_Ins"), In_Frame_Indel =
-  c("In_Frame_Ins", "In_Frame_Del")))
+    "De_novo_Start_OutOfFrame", "Start_Codon_Del", "Start_Codon_SNP"), Frame_Shift_Indel =
+    c("Frame_Shift_Del", "Frame_Shift_Ins"), In_Frame_Indel = c("In_Frame_Ins",
+    "In_Frame_Del"))
+)
 }
 \arguments{
 \item{a, b, x, r}{numeric vector. r for reference}

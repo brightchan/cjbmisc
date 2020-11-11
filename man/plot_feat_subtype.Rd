@@ -4,15 +4,34 @@
 \alias{plot_feat_subtype}
 \title{Plot multiple features of subtypes}
 \usage{
-plot_feat_subtype(plotdf, subtype, feat.plot, cont.plot = "boxplot",
-  cont.test = "wilcox.test", disc.test = "both", p.label = NULL,
-  p.symnum.args = list(), cont.show.mean = FALSE, show.count = TRUE,
-  cont.col = comp_hm_colist_full$disc, disc.col = comp_hm_colist_full,
-  disc.width = 0.8, cont.width = 0.9, disc.border = TRUE,
-  cont.border = TRUE, anno.textsize = 4, cont.anno.vjust = 0.2,
-  disc.anno.vjust = 0.04, aspect.ratio = 1.4, legend.position = "bottom",
-  highlight.signif = TRUE, highlight.signif.col = "red",
-  signif.cutoff = 0.05, plot.signif.only = F, ...)
+plot_feat_subtype(
+  plotdf,
+  subtype,
+  feat.plot,
+  cont.plot = "boxplot",
+  cont.test = "wilcox.test",
+  disc.test = "both",
+  p.label = NULL,
+  p.symnum.args = list(),
+  cont.show.mean = FALSE,
+  show.count = TRUE,
+  cont.col = comp_hm_colist_full$disc,
+  disc.col = comp_hm_colist_full,
+  disc.width = 0.8,
+  cont.width = 0.9,
+  disc.border = TRUE,
+  cont.border = TRUE,
+  anno.textsize = 4,
+  cont.anno.vjust = 0.2,
+  disc.anno.vjust = 0.04,
+  aspect.ratio = 1.4,
+  legend.position = "bottom",
+  highlight.signif = TRUE,
+  highlight.signif.col = "red",
+  signif.cutoff = 0.05,
+  plot.signif.only = F,
+  ...
+)
 }
 \arguments{
 \item{plotdf}{dataframe with rows of samples and columns of features, one column should contain the subtype info.}

@@ -38,8 +38,9 @@ one.v.all.t <- function(df,test=fisher.test,...){
          function(s){
     tmp <- data.frame(df[,s],rowSums(df)-df[,s])
     pvalue <- test(tmp,...)$p.value
-    if (pvalue<0.01) message(s," p=",pvalue,"**") 
+    if (pvalue<0.01) message(s," p=",pvalue,"**")
     else if (pvalue<0.05) message(s," p=",pvalue,"*")
     else message(s," p=",pvalue)
   })
 }
+

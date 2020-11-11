@@ -30,6 +30,7 @@ NULL
 #' @export
 # Only return p values:
 p_fish.chi.t <- function(df,v1,v2,alt="two.sided",p.test="both",ws=2e6){
+  df <- as.data.frame(df)
   if(p.test=="both"){
     tryCatch(fish.t(df,v1,v2,alt,ws)$p.value,
              error=function(e){
@@ -45,7 +46,8 @@ p_fish.chi.t <- function(df,v1,v2,alt="two.sided",p.test="both",ws=2e6){
 #' @rdname getPvalue
 #' @export
 p_aov.t <- function(df,v1,v2){
-  if (plyr::is.discrete(df[,v1]))
+  df <- as.data.frame(df)
+  if (plyr::is.discrete(df[,v1,drop=T]))
     f <- as.formula(paste0(v2,"~",v1)) else
       f <- as.formula(paste0(v1,"~",v2))
     aov <- aov(f, df)
@@ -53,7 +55,21 @@ p_aov.t <- function(df,v1,v2){
 }
 #' @rdname getPvalue
 #' @export
+p_ContCont <- function(df,v1,v2,method="spearman"){
+  # method to choose:
+  # spearman,pearson,kendall,lm
+  df <- as.data.frame(df)
+
+  if (method=="lm"){
+    return(p_lm(df,v1,v2))
+  }else{
+    return(cor.test(df[,v1],df[,v2],method = method)$p.value)
+  }
+}
+#' @rdname getPvalue
+#' @export
 p_ContDisc <- function(df,v1,v2,method="kruskal.test"){
+  df <- as.data.frame(df)
   if (plyr::is.discrete(df[,v1])){
     df[,v1] <- as.factor(df[,v1])
     f <- as.formula(paste0(v2,"~",v1))
@@ -66,30 +82,52 @@ p_ContDisc <- function(df,v1,v2,method="kruskal.test"){
 #' @rdname getPvalue
 #' @export
 p_lm <- function(df,v1,v2){
+  df <- as.data.frame(df)
   x <- df[,v1]
   y <- df[,v2]
   pvalue <- coef(summary(lm(y~x)))[2,4]
 }
 #' @rdname getPvalue
 #' @export
-p_feat_subtype <- function(df,subtype,feat,
-                              cont.test="kruskal.test",
-                              disc.test="both",...){
-  df <- df[,c(subtype,feat)]
+p_xVsAll <- function(df,x.coln,y.coln=NULL,
+                     num.num.test="spearman",
+                     cat.num.test="kruskal.test",
+                     cat.cat.test="both"){
 
-  feat.disc <- feat[sapply(df[,feat],function(x)!is.numeric(x))]
-  #feat.cont <- colnames(df)[sapply(df,function(x)is.numeric(x))]
+  df <- as.data.frame(df)
+  # use all columns if y.coln not provided
+  if(is.null(y.coln)) y.coln <- setdiff(colnames(df),x.coln)
 
-  p.list <- sapply(feat,function(x){
-    if(x %in% feat.disc){
-      return(p_fish.chi.t(df,subtype,x,p.test=disc.test,...))
-    }else{
-      return(p_ContDisc(df,subtype,x,cont.test))
-    }
-  })
-  setNames(p.list,feat)
+  df <- df[,c(x.coln,y.coln)]
+
+  feat.cate <- colnames(df)[sapply(df,function(x)!is.numeric(x))]
+
+  # when x is categorical:
+
+  if(x.coln %in% feat.cate){
+    vec.p <- sapply(y.coln,function(y){
+      if(y %in% feat.cate){
+        return(p_fish.chi.t(df,x.coln,y,p.test=cat.cat.test))
+      }else{
+        return(p_ContDisc(df,x.coln,y,cat.num.test))
+      }
+    })
+
+  }else{
+    vec.p <- sapply(y.coln,function(y){
+      if(y %in% feat.cate){
+        return(p_ContDisc(df,x.coln,y,cat.num.test))
+      }else{
+        return(p_ContCont(df,x.coln,y,num.num.test))
+      }
+    })
+  }
+
+  vec.p <- setNames(vec.p,y.coln)
+  return(vec.p)
 }
-
+#' @rdname getPvalue
+#' @export
 p_adjust_mat <- function(pvaldf, p.adjust.method = "BH") {
 
   pvec <- as.vector(pvaldf)

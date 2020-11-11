@@ -4,24 +4,36 @@
 \alias{getPvalue}
 \alias{p_fish.chi.t}
 \alias{p_aov.t}
+\alias{p_ContCont}
 \alias{p_ContDisc}
 \alias{p_lm}
-\alias{p_feat_subtype}
+\alias{p_xVsAll}
+\alias{p_adjust_mat}
 \title{Returning only the p values}
 \usage{
 p_fish.chi.t(df, v1, v2, alt = "two.sided", p.test = "both", ws = 2e+06)
 
 p_aov.t(df, v1, v2)
 
+p_ContCont(df, v1, v2, method = "spearman")
+
 p_ContDisc(df, v1, v2, method = "kruskal.test")
 
 p_lm(df, v1, v2)
 
-p_feat_subtype(df, subtype, feat, cont.test = "kruskal.test",
-  disc.test = "both", ...)
+p_xVsAll(
+  df,
+  x.coln,
+  y.coln = NULL,
+  num.num.test = "spearman",
+  cat.num.test = "kruskal.test",
+  cat.cat.test = "both"
+)
+
+p_adjust_mat(pvaldf, p.adjust.method = "BH")
 }
 \arguments{
-\item{df}{numeric dataframe}
+\item{df}{dataframe with rows of samples and columns of features, one column should contain the subtype info.}
 
 \item{v1, v2}{character of the column name in the df}
 
@@ -42,8 +54,6 @@ p_feat_subtype(df, subtype, feat, cont.test = "kruskal.test",
 \item{disc.test}{the significance test to be used for discrete variables. Should be "fisher","chi" or"both"}
 
 \item{...}{for p_feat_subtype, pass to \code{\link[cjbmisc]{p_fish.chi.t}}}
-
-\item{df}{dataframe with rows of samples and columns of features, one column should contain the subtype info.}
 }
 \description{
 A group of functions to return only the p values from various of tests.

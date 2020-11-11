@@ -4,9 +4,17 @@
 \alias{ggpairs_custom}
 \title{Plot pairwise correlations of multiple features}
 \usage{
-ggpairs_custom(ggdf, feat.plot = NULL, colist = comp_hm_colist_full,
-  sig.col = c("white", "thistle1", "orchid1"), plot.it = FALSE,
-  signif.cutoff = 0.05, return.pvalue = FALSE, verbose = FALSE, ...)
+ggpairs_custom(
+  ggdf,
+  feat.plot = NULL,
+  colist = comp_hm_colist_full,
+  sig.col = c("white", "thistle1", "orchid1"),
+  plot.it = FALSE,
+  signif.cutoff = 0.05,
+  return.pvalue = FALSE,
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
 \item{ggdf}{dataframe with rows of samples and columns of features}

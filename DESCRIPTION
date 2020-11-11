@@ -4,9 +4,9 @@ Version: 0.9.00
 Authors@R: person("Jianbin", "Chen", email = "chenjb618@gmail.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
 Depends: R (>= 3.4.1)
-Imports: circlize,EnvStats,GGally,ggfortify,gginnards,ggplot2,ggpubr,ggpubr,grid,RColorBrewer,RColorBrewer,scales,survival,survminer,VennDiagram
-Suggests: AnnotationDbi,org.Hs.eg.db,TxDb.Hsapiens.UCSC.hg19.knownGene,ComplexHeatmap,GenomicFeatures,GenomicRanges
+Imports: circlize,EnvStats,GGally,ggfortify,gginnards,ggplot2,ggpubr,ggpubr,grid,RColorBrewer,RColorBrewer,scales,survival,survminer,VennDiagram, ggstatsplot
+Suggests: ComplexHeatmap
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 7.1.1

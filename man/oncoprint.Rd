@@ -5,8 +5,15 @@
 \alias{maf2oncoprintdf}
 \title{Oncoprint plots}
 \usage{
-maf2oncoprintdf(inpmaf, gene = NULL, ordergene = FALSE, coding = TRUE,
-  noSilent = FALSE, mergeVariant = TRUE, subtypeOrder = NULL)
+maf2oncoprintdf(
+  inpmaf,
+  gene = NULL,
+  ordergene = FALSE,
+  coding = TRUE,
+  noSilent = FALSE,
+  mergeVariant = TRUE,
+  subtypeOrder = NULL
+)
 }
 \arguments{
 \item{inpmaf}{dataframe of the input maf, should have the columns of Variant_Classification, Hugo_Symbol, and Tumor_Sample_Barcode}
@@ -20,8 +27,6 @@ maf2oncoprintdf(inpmaf, gene = NULL, ordergene = FALSE, coding = TRUE,
 \item{noSilent}{boolean for whether to remove the silent mutations}
 
 \item{mergeVariant}{boolean for whether to merge the "Del and Ins" to "Indel" and various mutations to "Translation_Start_Site"}
-
-\item{subtypeOrder}{named character of the subtype info of the patients. If provided, the oncodf would be ordered by this subtype info.}
 
 \item{subtypeOrder}{a cha vector specifying the subtype of the samples, the oncodf will be ordered by subtype first.}
 }

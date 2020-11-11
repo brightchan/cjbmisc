@@ -7,15 +7,39 @@
 \alias{pca_bg}
 \title{PCA Plots}
 \usage{
-pca(df, A, B = NULL, title = "PCA", col = colpal, nameA = "subtypeA",
-  nameB = "subtypeB", point.size = 4, shapes = c(16:18, 15),
-  plot.it = TRUE)
+pca(
+  df,
+  A,
+  B = NULL,
+  title = "PCA",
+  col = colpal,
+  nameA = "subtypeA",
+  nameB = "subtypeB",
+  point.size = 4,
+  shapes = c(16:18, 15),
+  plot.it = TRUE,
+  return.data = FALSE
+)
 
-pca_multi(df, subtype = NULL, n = 6, col = colpal, title = NULL,
-  plot.it = TRUE)
+pca_multi(
+  df,
+  subtype = NULL,
+  n = 6,
+  col = colpal,
+  title = NULL,
+  plot.it = TRUE
+)
 
-pca_bg(df, subtype, col = colpal, legend.name = NULL, point.size = 6,
-  text.size = 26, mar = 15, plot.it = TRUE)
+pca_bg(
+  df,
+  subtype,
+  col = colpal,
+  legend.name = NULL,
+  point.size = 6,
+  text.size = 26,
+  mar = 15,
+  plot.it = TRUE
+)
 }
 \arguments{
 \item{df}{numeric dataframe with rows of samples and columns of features}

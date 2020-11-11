@@ -8,26 +8,72 @@
 \alias{plot_lm}
 \title{Miscellaneous plotting functions}
 \usage{
-perc_barplot(ggdf, x, y, title = NULL, col = comp_hm_colist_full$disc,
-  xlab = x, ylab = y, width = 0.9, aspect.ratio = 1.4,
-  p.label = "p.format", p.symnum.args = list(), show.count = TRUE,
-  anno.textsize = 4, anno.vjust = 0.04, border = TRUE, plot.it = FALSE,
-  highlight.signif = TRUE, highlight.signif.col = "orchid1",
-  signif.cutoff = 0.05, ...)
+perc_barplot(
+  ggdf,
+  x,
+  y,
+  title = NULL,
+  col = comp_hm_colist_full$disc,
+  xlab = x,
+  ylab = y,
+  width = 0.9,
+  aspect.ratio = 1.4,
+  p.label = "p.format",
+  p.symnum.args = list(),
+  show.count = TRUE,
+  anno.textsize = 4,
+  anno.vjust = 0.04,
+  border = TRUE,
+  plot.it = FALSE,
+  highlight.signif = TRUE,
+  highlight.signif.col = "orchid1",
+  signif.cutoff = 0.05,
+  ...
+)
 
-violin(ggdf, x, y, test = "wilcox.test", title = NULL, col = NULL,
-  xlab = x, ylab = y, width = 0.9, aspect.ratio = 1.4,
-  show.mean = TRUE, show.count = TRUE, p.label = NULL,
-  p.symnum.args = list(), anno.vjust = 0.1, anno.textsize = 4,
-  border = TRUE, plot.it = FALSE, highlight.signif = TRUE,
-  highlight.signif.col = "orchid1", signif.cutoff = 0.05,
-  plot.type = "violin", box.notch = FALSE, ...)
+violin(
+  ggdf,
+  x,
+  y,
+  test = "wilcox.test",
+  title = NULL,
+  col = NULL,
+  xlab = x,
+  ylab = y,
+  width = 0.9,
+  aspect.ratio = 1.4,
+  show.mean = TRUE,
+  show.count = TRUE,
+  p.label = NULL,
+  p.symnum.args = list(),
+  anno.vjust = 0.1,
+  anno.textsize = 4,
+  border = TRUE,
+  plot.it = FALSE,
+  highlight.signif = TRUE,
+  highlight.signif.col = "orchid1",
+  signif.cutoff = 0.05,
+  plot.type = "violin",
+  box.notch = FALSE,
+  ...
+)
 
 boxjitter(...)
 
-plot_lm(ggdf, x, y, title = NULL, col = "#00DD006F", show.anno = TRUE,
-  cor.method = "spearman", plot.it = TRUE, highlight.signif = TRUE,
-  highlight.signif.col = "orchid1", signif.cutoff = 0.05, ...)
+plot_lm(
+  ggdf,
+  x,
+  y,
+  title = NULL,
+  col = "#00DD006F",
+  show.anno = TRUE,
+  cor.method = "spearman",
+  plot.it = TRUE,
+  highlight.signif = TRUE,
+  highlight.signif.col = "orchid1",
+  signif.cutoff = 0.05,
+  ...
+)
 }
 \arguments{
 \item{ggdf, df}{dataframe with rows of samples and columns of features}

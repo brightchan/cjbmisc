@@ -6,8 +6,7 @@
 \alias{trisect}
 \title{Discretize a continuous vector}
 \usage{
-discretize(x, cutoff, label = NULL, include.lowest = TRUE,
-  summary = FALSE)
+discretize(x, cutoff, label = NULL, include.lowest = TRUE, summary = FALSE)
 
 trisect(x, na.rm = FALSE)
 }

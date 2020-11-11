@@ -6,9 +6,19 @@
 A warpper to plot survival plots
 to further customize the plot,}
 \usage{
-ggsurvpWrap(survdf, fac, cont.to.dis = NA, title = fac,
-  col = comp_hm_colist_full$disc, risk.table = F, xlim = c(0, 120),
-  break.time.by = 60, textsize = 10, pval.method = T, ...)
+ggsurvpWrap(
+  survdf,
+  fac,
+  cont.to.dis = NA,
+  title = fac,
+  col = comp_hm_colist_full$disc,
+  risk.table = F,
+  xlim = c(0, 120),
+  break.time.by = 60,
+  textsize = 10,
+  pval.method = T,
+  ...
+)
 }
 \arguments{
 \item{survdf}{dataframe with "OS_Month" (character or numeric) and "OS_Status" (numeric of 0,1; or factor with Alive as base level)}
