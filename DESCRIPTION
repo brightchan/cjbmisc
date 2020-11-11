@@ -2,7 +2,7 @@ Package: cjbmisc
 Title: What the Package Does (one line, title case)
 Version: 0.9.00
 Authors@R: person("Jianbin", "Chen", email = "chenjb618@gmail.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Description: Miscellaneous functions for plotting and genomics by CJB.
 Depends: R (>= 3.4.1)
 Imports: circlize,EnvStats,GGally,ggfortify,gginnards,ggplot2,ggpubr,ggpubr,grid,RColorBrewer,RColorBrewer,scales,survival,survminer,VennDiagram, ggstatsplot
 Suggests: ComplexHeatmap
