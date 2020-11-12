@@ -38,12 +38,25 @@ plot_corr_categorical <- function(plotdf,x.coln,y.coln=NULL,
   # exclude the x.coln in y.coln
   y.coln <- setdiff(y.coln,x.coln)
 
-  feat.cate <- colnames(plotdf)[sapply(plotdf,function(x)!is.numeric(x))]
+  # calculate the pvalues
+  pvalue <- p_xVsAll(plotdf,x.coln,y.coln,cat.num.test=cat.num.test,
+                     cat.cat.test=cat.cat.test)
 
   # generate all the plots
   message("Plotting: ",appendLF=F)
 
-  ### combine_plots and purrr
+  feat.cate <- colnames(plotdf)[sapply(plotdf,function(x)!is.numeric(x))]
+
+  if(plot.signif.only){
+    # Plot only siginificant plots
+    # by ignoring all non-significant ones
+    if(sum(pvalue<signif.cutoff)>0){
+      y.coln <- names(pvalue[pvalue<signif.cutoff])
+    } else{
+      warning("No significant correlation found.")
+      return(list(plot=NULL,pval=pvalue))
+    }
+  }
 
   plot.list <- lapply(y.coln,function(x){
     message(x,appendLF=F)
@@ -63,30 +76,18 @@ plot_corr_categorical <- function(plotdf,x.coln,y.coln=NULL,
                           pairwise.comparisons = TRUE,conf.level=(1-signif.cutoff),...)
       return(p) }
   })
+
   plot.list <- setNames(plot.list,y.coln)
 
   # Arrange the seqeunce of plots by pvalues
-  pvalue <- p_xVsAll(plotdf,x.coln,y.coln,cat.num.test=cat.num.test,
-                     cat.cat.test=cat.cat.test)
-  plot.list <- plot.list[order(pvalue)]
+  plot.list <- plot.list[order(pvalue[y.coln])]
 
-
-  # Plot only siginificant plots
-  if(plot.signif.only){
-    if(sum(pvalue<signif.cutoff)>0){
-      plot.list <- plot.list[(pvalue<signif.cutoff)[order(pvalue)]]
-    } else{
-      warning("No significant correlation found.")
-      return(list(plot=NULL,pval=pvalue))
-    }
-  }
-
-
+  # Arrange the plots into one pdf with ggarrange
   if(is.null(plot.nrow)|is.null(plot.ncol)) outp <- ggpubr::ggarrange(plotlist = plot.list)
   else  outp <- ggpubr::ggarrange(plotlist = plot.list,
                                        nrow = plot.nrow,ncol = plot.ncol,
                                        align = "hv")
-
+  # plot to screen
   if(plot.it) {
     plot(outp)
   }
@@ -111,10 +112,26 @@ plot_corr_numeric <- function(plotdf,x.coln,y.coln,
   y.coln <- setdiff(y.coln,x.coln)
 
 
-  feat.cate <- colnames(plotdf)[sapply(plotdf,function(x)!is.numeric(x))]
+  # calculate the pvalues
+  pvalue <- p_xVsAll(plotdf,x.coln,y.coln,cat.num.test=cat.num.test,
+                     num.num.test=num.num.test)
 
   # generate all the plots
   message("Plotting: ",appendLF=F)
+
+  feat.cate <- colnames(plotdf)[sapply(plotdf,function(x)!is.numeric(x))]
+
+  if(plot.signif.only){
+    # Plot only siginificant plots
+    # by ignoring all non-significant ones
+    if(sum(pvalue<signif.cutoff)>0){
+      y.coln <- names(pvalue[pvalue<signif.cutoff])
+    } else{
+      warning("No significant correlation found.")
+      return(list(plot=NULL,pval=pvalue))
+    }
+  }
+
   plot.list <- lapply(y.coln,function(y){
     message(y,appendLF=F)
     # Categorical
@@ -133,28 +150,18 @@ plot_corr_numeric <- function(plotdf,x.coln,y.coln,
   })
   plot.list <- setNames(plot.list,y.coln)
 
+
   # Arrange the seqeunce of plots by pvalues
-  pvalue <- p_xVsAll(plotdf,x.coln,y.coln,cat.num.test=cat.num.test,
-                     num.num.test=num.num.test)
-  plot.list <- plot.list[order(pvalue)]
+  plot.list <- plot.list[order(pvalue[y.coln])]
 
 
-  # Plot only siginificant plots
-  if(plot.signif.only){
-    if(sum(pvalue<signif.cutoff)>0){
-      plot.list <- plot.list[(pvalue<signif.cutoff)[order(pvalue)]]
-    } else{
-      warning("No significant correlation found.")
-      return(list(plot=NULL,pval=pvalue))
-    }
-  }
-
-
+  # Arrange the plots into one pdf with ggarrange
   if(is.null(plot.nrow)|is.null(plot.ncol)) outp <- ggpubr::ggarrange(plotlist = plot.list)
   else  outp <- ggpubr::ggarrange(plotlist = plot.list,
                                        nrow = plot.nrow,ncol = plot.ncol,
                                        align = "hv")
 
+  # plot to screen
   if(plot.it) {
     plot(outp)
   }
