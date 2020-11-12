@@ -14,6 +14,7 @@
 #' @param plot.signif.only whether to plot only the significant items
 #' @param plot.it Whether to plot it out (T/F)
 #' @param outpdir If not NULL, save all plots and pvalues (as table) to the outpdir
+#' @param w.plot,h.plot Width and height of each individual plot
 #' @param ... pass to \code{\link[ggstatsplot]{ggbarstats}} , \code{\link[ggstatsplot]{ggbetweenstats}} ,\code{\link[ggstatsplot]{ggscatterstats}}
 #' @return For plot_corr, List of returns from plot_corr_numeric or plot_corr_categorical. For plot_corr_categorical and plot_corr_numeric: List of two: "plot" of ggarrange object which arrange all plot into one, and "pvalues" of a named vector.
 #'
@@ -171,7 +172,8 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
                       plot.it=F,plot.nrow=NULL,plot.ncol=NULL,
                       signif.cutoff=0.05,
                       plot.signif.only=F,seed=999,
-                      outpdir=NULL,...){
+                      outpdir=NULL,
+                      w.plot=3.8,h.plot=4.5,...){
 
   # use all columns if y.coln not provided
   if(is.null(y.coln)) y.coln <- setdiff(colnames(plotdf),x.coln)
@@ -203,10 +205,6 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
   # plot all plots and tables and put inside outpdir
   if(!is.null(outpdir)){
 
-    # define a basic single plot width and height
-    w.plot <- 3.5
-    h.plot <- 4
-
     for(n in names(lst.out)){
       if(!is.null(lst.out[[n]]$plot)){
 
@@ -224,7 +222,7 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
         }
 
         ggsave(paste0(outpdir,"\\",n,".pdf"),lst.out[[n]]$plot,
-               width=w.plot*plot.nrow,height = h.plot*plot.ncol)
+               width=w.plot*plot.ncol,height = h.plot*plot.nrow)
       }
 
     }

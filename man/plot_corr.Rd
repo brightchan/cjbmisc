@@ -50,6 +50,8 @@ plot_corr(
   plot.signif.only = F,
   seed = 999,
   outpdir = NULL,
+  w.plot = 3.8,
+  h.plot = 4.5,
   ...
 )
 }
@@ -75,6 +77,8 @@ plot_corr(
 \item{num.num.test}{the significance test to be used for numerical vs numerical variables. Should be "spearman"(Default), "pearson", "kendall", or "lm"(using the pvalue of the independent variable in lm).}
 
 \item{outpdir}{If not NULL, save all plots and pvalues (as table) to the outpdir}
+
+\item{w.plot, h.plot}{Width and height of each individual plot}
 }
 \value{
 For plot_corr, List of returns from plot_corr_numeric or plot_corr_categorical. For plot_corr_categorical and plot_corr_numeric: List of two: "plot" of ggarrange object which arrange all plot into one, and "pvalues" of a named vector.
