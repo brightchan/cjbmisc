@@ -73,7 +73,7 @@ plot_corr_categorical <- function(plotdf,x.coln,y.coln=NULL,
   # Plot only siginificant plots
   if(plot.signif.only){
     if(sum(pvalue<signif.cutoff)>0){
-      plot.list <- plot.list[(pvlaue<signif.cutoff)[order(pvalue)]]
+      plot.list <- plot.list[(pvalue<signif.cutoff)[order(pvalue)]]
     } else{
       warning("No significant correlation found.")
       return(list(plot=NULL,pval=pvalue))
@@ -141,7 +141,7 @@ plot_corr_numeric <- function(plotdf,x.coln,y.coln,
   # Plot only siginificant plots
   if(plot.signif.only){
     if(sum(pvalue<signif.cutoff)>0){
-      plot.list <- plot.list[(pvlaue<signif.cutoff)[order(pvalue)]]
+      plot.list <- plot.list[(pvalue<signif.cutoff)[order(pvalue)]]
     } else{
       warning("No significant correlation found.")
       return(list(plot=NULL,pval=pvalue))
