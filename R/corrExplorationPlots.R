@@ -7,9 +7,9 @@
 #' @param plotdf dataframe with rows of samples and columns of features.
 #' @param x.coln column name of the x axis of the plot
 #' @param y.coln character vector of the column names of features to be plotted as y axis
-#' @param cat.num.test the significance test to be used for categorical vs numeric variables. Use the name of the r basic tests.
-#' @param cat.cat.test the significance test to be used for categorical vs categorical variables. Should be "fisher","chi" or"both"
-#' @param num.num.test the significance test to be used for categorical vs categorical variables. Should be "fisher","chi" or"both"
+#' @param cat.num.test the significance test to be used for categorical vs numerical variables. Use the name of the r basic tests (Default "kruskal.test").
+#' @param cat.cat.test the significance test to be used for categorical vs categorical variables. Should be "fisher","chi" or "both"(Default)
+#' @param num.num.test the significance test to be used for numerical vs numerical variables. Should be "spearman"(Default), "pearson", "kendall", or "lm"(using the pvalue of the independent variable in lm).
 #' @param plot.nrow,plot.ncol The number of rows and columns in the combined plot
 #' @param plot.signif.only whether to plot only the significant items
 #' @param plot.it Whether to plot it out (T/F)
@@ -72,7 +72,7 @@ plot_corr_categorical <- function(plotdf,x.coln,y.coln=NULL,
 
   # Plot only siginificant plots
   if(plot.signif.only){
-    if(sum(pvlaue<signif.cutoff)>0){
+    if(sum(pvalue<signif.cutoff)>0){
       plot.list <- plot.list[(pvlaue<signif.cutoff)[order(pvalue)]]
     } else{
       warning("No significant correlation found.")
@@ -140,7 +140,7 @@ plot_corr_numeric <- function(plotdf,x.coln,y.coln,
 
   # Plot only siginificant plots
   if(plot.signif.only){
-    if(sum(pvlaue<signif.cutoff)>0){
+    if(sum(pvalue<signif.cutoff)>0){
       plot.list <- plot.list[(pvlaue<signif.cutoff)[order(pvalue)]]
     } else{
       warning("No significant correlation found.")

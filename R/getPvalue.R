@@ -7,7 +7,10 @@
 #'   If only Fisher's exact test or ChiSQ is wanted, specify it in "p.test" parameter
 #'   \item p_aov.t: p-value from \code{\link[stats]{aov}}
 #'   \item p_ContDisc: p-value from \code{\link[stats]{t.test}},\code{\link[stats]{wilcox.test}},\code{\link[stats]{kruskal.test}}
+#'   \item p_ContCont: p-value from \code{\link[stats]{cor.test}} or from\code{\link[cjbmisc]{p_lm}}
 #'   \item p_lm: p-value of the coefficient from the univariate \code{\link[stats]{lm}}
+#'   \item p_adjust_mat: adjust a matrix of p-values
+#'   \item p_xVsAll: generate a vector of pvalues by contrasting x vs all the rest of the variables in a dataframe.
 #'   \item p_feat_subtype: p-value of a set of features according to a subtype in a manner similar to \code{\link[cjbmisc]{plot_feat_subtype}}
 #' }
 #' @param df numeric dataframe

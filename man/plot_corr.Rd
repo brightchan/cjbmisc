@@ -60,9 +60,9 @@ plot_corr(
 
 \item{y.coln}{character vector of the column names of features to be plotted as y axis}
 
-\item{cat.num.test}{the significance test to be used for categorical vs numeric variables. Use the name of the r basic tests.}
+\item{cat.num.test}{the significance test to be used for categorical vs numerical variables. Use the name of the r basic tests (Default "kruskal.test").}
 
-\item{cat.cat.test}{the significance test to be used for categorical vs categorical variables. Should be "fisher","chi" or"both"}
+\item{cat.cat.test}{the significance test to be used for categorical vs categorical variables. Should be "fisher","chi" or "both"(Default)}
 
 \item{plot.it}{Whether to plot it out (T/F)}
 
@@ -72,7 +72,7 @@ plot_corr(
 
 \item{...}{pass to \code{\link[ggstatsplot]{ggbarstats}} , \code{\link[ggstatsplot]{ggbetweenstats}} ,\code{\link[ggstatsplot]{ggscatterstats}}}
 
-\item{num.num.test}{the significance test to be used for categorical vs categorical variables. Should be "fisher","chi" or"both"}
+\item{num.num.test}{the significance test to be used for numerical vs numerical variables. Should be "spearman"(Default), "pearson", "kendall", or "lm"(using the pvalue of the independent variable in lm).}
 
 \item{outpdir}{If not NULL, save all plots and pvalues (as table) to the outpdir}
 }
