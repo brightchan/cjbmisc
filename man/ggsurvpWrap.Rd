@@ -9,6 +9,8 @@ to further customize the plot,}
 ggsurvpWrap(
   survdf,
   fac,
+  surv.time = "OS_Month",
+  surv.status = "OS_Status",
   cont.to.dis = NA,
   title = fac,
   col = comp_hm_colist_full$disc,
@@ -21,9 +23,11 @@ ggsurvpWrap(
 )
 }
 \arguments{
-\item{survdf}{dataframe with "OS_Month" (character or numeric) and "OS_Status" (numeric of 0,1; or factor with Alive as base level)}
+\item{survdf}{dataframe with \emph{surv.time} (character or numeric) and \emph{surv.status}  (numeric of 0,1; or factor with Alive as base level)}
 
 \item{fac}{character of the column name in the survdf to stratify the patients}
+
+\item{surv.time, surv.status}{column name of the survival time and status in the dataframe}
 
 \item{cont.to.dis}{if \emph{fac} is numeric, how to discretize it. Can be a funciton (Default \emph{median}) or cutoff points (n-1 points)}
 

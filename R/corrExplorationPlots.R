@@ -43,7 +43,7 @@ plot_corr_categorical <- function(plotdf,x.coln,y.coln=NULL,
                      cat.cat.test=cat.cat.test)
 
   # generate all the plots
-  message("Plotting: ",appendLF=F)
+  message("Plotting: ",x.coln," vs ",appendLF=F)
 
   feat.cate <- colnames(plotdf)[sapply(plotdf,function(x)!is.numeric(x))]
 
@@ -117,7 +117,7 @@ plot_corr_numeric <- function(plotdf,x.coln,y.coln,
                      num.num.test=num.num.test)
 
   # generate all the plots
-  message("Plotting: ",appendLF=F)
+  message("Plotting: ",x.coln," vs ",appendLF=F)
 
   feat.cate <- colnames(plotdf)[sapply(plotdf,function(x)!is.numeric(x))]
 
@@ -235,12 +235,13 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
     }
 
     # save the pvalues as a table
-    lst.pval <- sapply(lst.out,"[[","pval") %>% lapply(as.data.frame)
+    lst.pval <- lapply(lst.out,"[[","pval") %>% lapply(as.data.frame)
     df.pval <- lapply(names(lst.pval), function(n){
       colnames(lst.pval[[n]]) <- n
       lst.pval[[n]]$Features <- row.names(lst.pval[[n]])
       return(lst.pval[[n]])
-    }) %>% Reduce(full_join,.)
+    }) %>% Reduce(full_join,.) %>%
+      select(Features,everything())
 
     write.table(df.pval,paste0(outpdir,"\\pvalues.tsv"),sep = "\t",row.names = F)
   }

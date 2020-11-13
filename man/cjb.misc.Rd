@@ -30,8 +30,8 @@ gsub_multi(
   df,
   column = "Variant_Classification",
   sub = list(Translation_Start_Site = c("De_novo_Start_InFrame",
-    "De_novo_Start_OutOfFrame", "Start_Codon_Del", "Start_Codon_SNP"), Frame_Shift_Indel =
-    c("Frame_Shift_Del", "Frame_Shift_Ins"), In_Frame_Indel = c("In_Frame_Ins",
+    "De_novo_Start_OutOfFrame", "Start_Codon_Del", "Start_Codon_SNP"), Frame_Shift_Indel
+    = c("Frame_Shift_Del", "Frame_Shift_Ins"), In_Frame_Indel = c("In_Frame_Ins",
     "In_Frame_Del"))
 )
 }
