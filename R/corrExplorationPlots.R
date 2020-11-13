@@ -228,7 +228,7 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
           plot.ncol = nm[2]
         }
 
-        ggsave(paste0(outpdir,"\\",n,".pdf"),lst.out[[n]]$plot,
+        ggsave(paste0(outpdir,"/",n,".pdf"),lst.out[[n]]$plot,
                width=w.plot*plot.ncol,height = h.plot*plot.nrow)
       }
 
@@ -243,7 +243,7 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
     }) %>% Reduce(full_join,.) %>%
       select(Features,everything())
 
-    write.table(df.pval,paste0(outpdir,"\\pvalues.tsv"),sep = "\t",row.names = F)
+    write.table(df.pval,paste0(outpdir,"/pvalues.tsv"),sep = "\t",row.names = F)
   }
 
   return(outp=lst.out)
