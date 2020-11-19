@@ -70,8 +70,8 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
   y.coln.plot <- y.coln.plot[order(pvalue[y.coln.plot])]
 
 
-  # plot only the max number of plots
-  if(!is.null(plot.max)) y.coln.plot <- y.coln.plot[1:plot.max]
+  # plot only the max number of plots if number of significant plot is more than plot.max
+  if(!is.null(plot.max)&length(y.coln.plot)>plot.max) y.coln.plot <- y.coln.plot[1:plot.max]
 
 
   # check which are categorical columns
