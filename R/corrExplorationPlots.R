@@ -12,11 +12,12 @@
 #' @param num.num.test the significance test to be used for numerical vs numerical variables. Should be "spearman"(Default), "pearson", "kendall", or "lm"(using the pvalue of the independent variable in lm).
 #' @param plot.nrow,plot.ncol The number of rows and columns in the combined plot
 #' @param plot.signif.only whether to plot only the significant items
+#' @param plot.max maximum how many plots to be plotted. If set to NULL then plot all.
 #' @param plot.it Whether to plot it out (T/F)
 #' @param outpdir If not NULL, save all plots and pvalues (as table) to the outpdir
 #' @param plot.w,plot.h Width and height of each individual plot
 #' @param ... pass to \code{\link[ggstatsplot]{ggbarstats}} , \code{\link[ggstatsplot]{ggbetweenstats}} ,\code{\link[ggstatsplot]{ggscatterstats}}
-#' @return For plot_corr, List of returns from plot_corr_numeric or plot_corr_categorical. For plot_corr_categorical and plot_corr_numeric: List of two: "plot" of ggarrange object which arrange all plot into one, and "pvalues" of a named vector.
+#' @return For plot_corr, List of returns from plot_corr_one. For plot_corr_one: List of two: "plot" of ggarrange object which arrange all plot into one, and "pvalues" of a named vector.
 #'
 #' @name plot_corr
 #' @import ggstatsplot
@@ -24,125 +25,14 @@
 #' @import dplyr
 #'
 #' @export
-plot_corr_categorical <- function(plotdf,x.coln,y.coln=NULL,
-                                  cat.num.test="kruskal.test",
-                                  cat.cat.test="both",
-                                  plot.it=F,plot.nrow=NULL,plot.ncol=NULL,
-                                  signif.cutoff=0.05,
-                                  plot.signif.only=F,seed=999,
-                                  outpdir=NULL,
-                                  plot.w=6.5,plot.h=7.5,...){
-
-  set.seed(seed)
-
-  # use all columns if y.coln not provided
-  if(is.null(y.coln)) y.coln <- setdiff(colnames(plotdf),x.coln)
-  # exclude the x.coln in y.coln
-  y.coln <- setdiff(y.coln,x.coln)
-
-  # calculate the pvalues
-  pvalue <- p_xVsAll(plotdf,x.coln,y.coln,cat.num.test=cat.num.test,
-                     cat.cat.test=cat.cat.test)
-
-  # generate all the plots
-  message("*****Plotting: ",x.coln," vs ",appendLF=F)
-
-  feat.cate <- colnames(plotdf)[sapply(plotdf,function(x)!is.numeric(x))]
-
-  if(plot.signif.only){
-    # Plot only siginificant plots
-    # by ignoring all non-significant ones
-    if(sum(pvalue<signif.cutoff)>0){
-      y.coln <- names(pvalue[pvalue<signif.cutoff])
-    } else{
-      warning("No significant correlation found.")
-      return(list(plot=NULL,pval=pvalue))
-    }
-  }
-
-  plot.list <- lapply(y.coln,function(x){
-    message(x,appendLF=F)
-    # Categorical
-    if(x %in% feat.cate){
-      message(":Cate ",appendLF=F)
-      p <- ggbarstats(plotdf[!is.na(plotdf[,x.coln]),],!!x,!!x.coln,
-                      title=x,conf.level=(1-signif.cutoff),
-                      proportion.test = F,
-                      ...)
-    } else {
-      # Numeric
-      message(":Num ",appendLF=F)
-      # TODO: add ggwithinstats support for groups with paired samples
-      p <- ggbetweenstats(plotdf[!is.na(plotdf[,x.coln]),],!!x.coln,!!x,title=x,
-                          type = "np",# usually we should use non-parametric tests
-                          pairwise.comparisons = TRUE,conf.level=(1-signif.cutoff),...)
-      return(p) }
-  })
-
-  plot.list <- setNames(plot.list,y.coln)
-
-  # Arrange the seqeunce of plots by pvalues
-  plot.list <- plot.list[order(pvalue[y.coln])]
-
-
-  ## generate the ggarrange plot for the output
-
-  # get the num of row and col to decide the plot size
-  # following the "arrangeGrob" function used by ggarrange
-  # but set a maximum size of 5*4
-
-  plot.nrow.max <- 5
-  plot.ncol.max <- 4
-
-  n.plots <- length(plot.list)
-
-  if (is.null(plot.nrow) && !is.null(plot.ncol)) {
-    plot.nrow <- ceiling(n.plots/plot.ncol)
-    if(plot.nrow>plot.nrow.max) plot.nrow=plot.nrow.max
-  }else if (is.null(plot.ncol) && !is.null(plot.nrow)) {
-    plot.ncol <- ceiling(n.plots/plot.nrow)
-    if(plot.ncol>plot.ncol.max) plot.ncol=plot.ncol.max
-  }else if (is.null(plot.nrow) && is.null(plot.ncol)){
-    if(n.plots>plot.nrow.max*plot.ncol.max){
-      plot.nrow=plot.nrow.max
-      plot.ncol=plot.ncol.max
-    }else{
-      nm <- grDevices::n2mfrow(n.plots)
-      plot.nrow = nm[1]
-      plot.ncol = nm[2]
-    }
-  }
-
-  # Arrange the plots into one pdf with ggarrange
-  outp <- ggpubr::ggarrange(plotlist = plot.list,
-                            nrow = plot.nrow,ncol = plot.ncol,
-                            align = "hv")
-
-
-  # save figure to outpdir
-  if(!is.null(outpdir)){
-    pdf(paste0(outpdir,"/",x.coln,".pdf"),
-        width=plot.w*plot.ncol,height = plot.h*plot.nrow)
-    print(outp)
-    dev.off()
-  }
-
-  # plot to screen
-  if(plot.it) {
-    print(outp)
-  }
-
-  return(list(plot=outp,pval=pvalue))
-}
-
-#' @rdname plot_corr
-#' @export
-plot_corr_numeric <- function(plotdf,x.coln,y.coln,
+plot_corr_one <- function(plotdf,x.coln,y.coln,
                               cat.num.test="kruskal.test",
                               num.num.test="spearman",
                               plot.it=F,plot.nrow=NULL,plot.ncol=NULL,
                               signif.cutoff=0.05,
-                              plot.signif.only=F,seed=999,
+                              plot.signif.only=F,
+                              plot.max=40,
+                              seed=999,
                               outpdir=NULL,
                               plot.w=6.5,plot.h=7.5,...){
 
@@ -154,47 +44,81 @@ plot_corr_numeric <- function(plotdf,x.coln,y.coln,
   y.coln <- setdiff(y.coln,x.coln)
 
 
-  # calculate the pvalues
+  ### calculate the pvalues
   pvalue <- p_xVsAll(plotdf,x.coln,y.coln,cat.num.test=cat.num.test,
                      num.num.test=num.num.test)
 
-  # generate all the plots
+
+  ### generate all the plots
   message("*****Plotting: ",x.coln," vs ",appendLF=F)
 
-  feat.cate <- colnames(plotdf)[sapply(plotdf,function(x)!is.numeric(x))]
+  y.coln.plot <- y.coln
 
   if(plot.signif.only){
     # Plot only siginificant plots
     # by ignoring all non-significant ones
     if(sum(pvalue<signif.cutoff)>0){
-      y.coln <- names(pvalue[pvalue<signif.cutoff])
+      y.coln.plot <- names(pvalue[pvalue<signif.cutoff])
     } else{
       warning("No significant correlation found.")
       return(list(plot=NULL,pval=pvalue))
     }
   }
 
-  plot.list <- lapply(y.coln,function(y){
-    message(y,appendLF=F)
-    # Categorical
-    if(y %in% feat.cate){
-      message(":Cate ",appendLF=F)
-      p <- ggbetweenstats(plotdf[!is.na(plotdf[,y]),],!!y,!!x.coln,title=y,
-                          type = "np",# usually we should use non-parametric tests
-                          pairwise.comparisons = TRUE,conf.level=(1-signif.cutoff),...)
-    } else {
-      # Numeric
-      message(":Num ",appendLF=F)
-      # TODO: add ggwithinstats support for groups with paired samples
-      p <- ggscatterstats(plotdf[!is.na(plotdf[,x.coln]),],!!x.coln,!!y,title=y,
-                          marginal.type="densigram",...)
-      return(p) }
-  })
-  plot.list <- setNames(plot.list,y.coln)
-
 
   # Arrange the seqeunce of plots by pvalues
-  plot.list <- plot.list[order(pvalue[y.coln])]
+  y.coln.plot <- y.coln.plot[order(pvalue[y.coln.plot])]
+
+
+  # plot only the max number of plots
+  if(!is.null(plot.max)) y.coln.plot <- y.coln.plot[1:plot.max]
+
+
+  # check which are categorical columns
+  feat.cate <- colnames(plotdf)[sapply(plotdf,function(x)!is.numeric(x))]
+
+
+  # use different plots for different combinations of catergorical/numerical values
+  if(x.coln %in% feat.cate){
+    plot.list <- lapply(y.coln.plot,function(x){
+      message(x,appendLF=F)
+      # Categorical
+      if(x %in% feat.cate){
+        message(":Cate ",appendLF=F)
+        p <- ggbarstats(plotdf[!is.na(plotdf[,x.coln]),],!!x,!!x.coln,
+                        title=x,conf.level=(1-signif.cutoff),
+                        proportion.test = F,
+                        ...)
+      } else {
+        # Numeric
+        message(":Num ",appendLF=F)
+        # TODO: add ggwithinstats support for groups with paired samples
+        p <- ggbetweenstats(plotdf[!is.na(plotdf[,x.coln]),],!!x.coln,!!x,title=x,
+                            type = "np",# usually we should use non-parametric tests
+                            pairwise.comparisons = TRUE,conf.level=(1-signif.cutoff),...)
+        return(p) }
+    })
+  } else{
+    plot.list <- lapply(y.coln.plot,function(y){
+      message(y,appendLF=F)
+      # Categorical
+      if(y %in% feat.cate){
+        message(":Cate ",appendLF=F)
+        p <- ggbetweenstats(plotdf[!is.na(plotdf[,y]),],!!y,!!x.coln,title=y,
+                            type = "np",# usually we should use non-parametric tests
+                            pairwise.comparisons = TRUE,conf.level=(1-signif.cutoff),...)
+      } else {
+        # Numeric
+        message(":Num ",appendLF=F)
+        # TODO: add ggwithinstats support for groups with paired samples
+        p <- ggscatterstats(plotdf[!is.na(plotdf[,x.coln]),],!!x.coln,!!y,title=y,
+                            marginal.type="densigram",...)
+        return(p) }
+    })
+  }
+
+
+  plot.list <- setNames(plot.list,y.coln.plot)
 
 
   ## generate the ggarrange plot for the output
@@ -244,10 +168,11 @@ plot_corr_numeric <- function(plotdf,x.coln,y.coln,
     print(outp)
   }
 
-
   return(list(plot=outp,pval=pvalue))
 
 }
+
+
 
 #' @rdname plot_corr
 #' @export
@@ -255,9 +180,11 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
                       cat.num.test="kruskal.test",
                       cat.cat.test="both",
                       num.num.test="spearman",
-                      plot.it=F,plot.nrow=NULL,plot.ncol=NULL,
+                      plot.it=F,
+                      plot.nrow=NULL,plot.ncol=NULL,
                       signif.cutoff=0.05,
-                      plot.signif.only=F,seed=999,
+                      plot.signif.only=F,plot.max=50,
+                      seed=999,
                       outpdir=NULL,
                       plot.w=6.5,plot.h=7.5,...){
 
@@ -268,24 +195,13 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
 
   lst.out <- lapply(setNames(x.coln,x.coln),
          function(x){
-           if(x %in% feat.cate)
-             plot_corr_categorical(
-               plotdf,x,y.coln=setdiff(y.coln,x),
-               cat.num.test="kruskal.test",
-               cat.cat.test="both",
-               plot.it=plot.it,plot.nrow=plot.nrow,plot.ncol=plot.ncol,
-               signif.cutoff=signif.cutoff,
-               plot.signif.only=plot.signif.only,seed=seed,
-               outpdir=outpdir,...
-             )
-           else
-             plot_corr_numeric(
+           plot_corr_one(
              plotdf,x,y.coln=setdiff(y.coln,x),
              cat.num.test="kruskal.test",
              num.num.test="spearman",
              plot.it=plot.it,plot.nrow=plot.nrow,plot.ncol=plot.ncol,
              signif.cutoff=signif.cutoff,
-             plot.signif.only=plot.signif.only,seed=seed,
+             plot.signif.only=plot.signif.only,plot.max=plot.max,seed=seed,
              outpdir=outpdir,...
            )
            })

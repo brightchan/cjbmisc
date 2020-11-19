@@ -2,29 +2,10 @@
 % Please edit documentation in R/corrExplorationPlots.R
 \name{plot_corr}
 \alias{plot_corr}
-\alias{plot_corr_categorical}
-\alias{plot_corr_numeric}
+\alias{plot_corr_one}
 \title{Plots to explore the correlations between features}
 \usage{
-plot_corr_categorical(
-  plotdf,
-  x.coln,
-  y.coln = NULL,
-  cat.num.test = "kruskal.test",
-  cat.cat.test = "both",
-  plot.it = F,
-  plot.nrow = NULL,
-  plot.ncol = NULL,
-  signif.cutoff = 0.05,
-  plot.signif.only = F,
-  seed = 999,
-  outpdir = NULL,
-  plot.w = 6.5,
-  plot.h = 7.5,
-  ...
-)
-
-plot_corr_numeric(
+plot_corr_one(
   plotdf,
   x.coln,
   y.coln,
@@ -35,6 +16,7 @@ plot_corr_numeric(
   plot.ncol = NULL,
   signif.cutoff = 0.05,
   plot.signif.only = F,
+  plot.max = 40,
   seed = 999,
   outpdir = NULL,
   plot.w = 6.5,
@@ -54,6 +36,7 @@ plot_corr(
   plot.ncol = NULL,
   signif.cutoff = 0.05,
   plot.signif.only = F,
+  plot.max = 50,
   seed = 999,
   outpdir = NULL,
   plot.w = 6.5,
@@ -70,7 +53,7 @@ plot_corr(
 
 \item{cat.num.test}{the significance test to be used for categorical vs numerical variables. Use the name of the r basic tests (Default "kruskal.test").}
 
-\item{cat.cat.test}{the significance test to be used for categorical vs categorical variables. Should be "fisher","chi" or "both"(Default)}
+\item{num.num.test}{the significance test to be used for numerical vs numerical variables. Should be "spearman"(Default), "pearson", "kendall", or "lm"(using the pvalue of the independent variable in lm).}
 
 \item{plot.it}{Whether to plot it out (T/F)}
 
@@ -78,16 +61,18 @@ plot_corr(
 
 \item{plot.signif.only}{whether to plot only the significant items}
 
+\item{plot.max}{maximum how many plots to be plotted. If set to NULL then plot all.}
+
 \item{outpdir}{If not NULL, save all plots and pvalues (as table) to the outpdir}
 
 \item{plot.w, plot.h}{Width and height of each individual plot}
 
 \item{...}{pass to \code{\link[ggstatsplot]{ggbarstats}} , \code{\link[ggstatsplot]{ggbetweenstats}} ,\code{\link[ggstatsplot]{ggscatterstats}}}
 
-\item{num.num.test}{the significance test to be used for numerical vs numerical variables. Should be "spearman"(Default), "pearson", "kendall", or "lm"(using the pvalue of the independent variable in lm).}
+\item{cat.cat.test}{the significance test to be used for categorical vs categorical variables. Should be "fisher","chi" or "both"(Default)}
 }
 \value{
-For plot_corr, List of returns from plot_corr_numeric or plot_corr_categorical. For plot_corr_categorical and plot_corr_numeric: List of two: "plot" of ggarrange object which arrange all plot into one, and "pvalues" of a named vector.
+For plot_corr, List of returns from plot_corr_one. For plot_corr_one: List of two: "plot" of ggarrange object which arrange all plot into one, and "pvalues" of a named vector.
 }
 \description{
 Plot the correlations focusing on a variable x vs all the rest

@@ -127,6 +127,7 @@ p_xVsAll <- function(df,x.coln,y.coln=NULL,
   }
 
   vec.p <- setNames(vec.p,y.coln)
+
   return(vec.p)
 }
 #' @rdname getPvalue
