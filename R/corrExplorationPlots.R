@@ -157,7 +157,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
 
   # save figure to outpdir
   if(!is.null(outpdir)){
-    dir.create(outpdir,showWarnings=F)
+    dir.create(outpdir,showWarnings=F,recursive=T)
     pdf(paste0(outpdir,"/",x.coln,".pdf"),
         width=plot.w*plot.ncol,height = plot.h*plot.nrow)
     print(outp)
