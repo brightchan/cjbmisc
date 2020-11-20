@@ -2,6 +2,10 @@
 #'
 #' Plot the correlations focusing on a variable x vs all the rest
 #' of the variables.
+#' The workflow is: 1. remove small groups if "min.group.size" is defined;
+#' 2. calculate the p values for all pairs of variables
+#' 3. select the ones that pass pvalue threshold for plotting
+#' 4. calculate padj and save the plots and pvalue tables.
 
 #'
 #' @param plotdf dataframe with rows of samples and columns of features.
@@ -13,6 +17,8 @@
 #' @param plot.nrow,plot.ncol The number of rows and columns in the combined plot
 #' @param plot.signif.only whether to plot only the significant items
 #' @param plot.max maximum how many plots to be plotted. If set to NULL then plot all.
+#' @param min.group.size.x for categorical x, remove groups that are smaller than this number
+#' @param min.group.size.y for categorical y, remove groups that are smaller than this number
 #' @param plot.it Whether to plot it out (T/F)
 #' @param outpdir If not NULL, save all plots and pvalues (as table) to the outpdir
 #' @param plot.w,plot.h Width and height of each individual plot
@@ -26,15 +32,19 @@
 #'
 #' @export
 plot_corr_one <- function(plotdf,x.coln,y.coln,
-                              cat.num.test="kruskal.test",
-                              num.num.test="spearman",
-                              plot.it=F,plot.nrow=NULL,plot.ncol=NULL,
-                              signif.cutoff=0.05,
-                              plot.signif.only=F,
-                              plot.max=40,
-                              seed=999,
-                              outpdir=NULL,
-                              plot.w=6.5,plot.h=7.5,...){
+                          cat.num.test="kruskal.test",
+                          num.num.test="spearman",
+                          plot.it=F,plot.nrow=NULL,plot.ncol=NULL,
+                          signif.cutoff=0.05,
+                          plot.signif.only=F,
+                          plot.max=40,
+                          min.group.size.x=3,
+                          min.group.size.y=3,
+                          seed=999,
+                          outpdir=NULL,
+                          plot.w=6.5,plot.h=7.5,...){
+
+  note <- ""
 
   set.seed(seed)
 
@@ -42,6 +52,26 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
   if(is.null(y.coln)) y.coln <- setdiff(colnames(plotdf),x.coln)
   # exclude the x.coln in y.coln
   y.coln <- setdiff(y.coln,x.coln)
+
+
+  # check which are categorical columns
+  feat.cate <- colnames(plotdf)[sapply(plotdf,function(x)!is.numeric(x))]
+
+
+
+  # remove small groups from categorical features by setting them to NA
+  # Keep a Note in the output file
+  if(!is.null(min.group.size.x)){
+    note <- paste0(note,"_grp.x.gt",min.group.size.x)
+    plotdf <- plotdf %>%
+      mutate_at(vars(!!x.coln),~ifelse(table(.)[.]<min.group.size.x,NA,.))
+  }
+  if(!is.null(min.group.size.y)){
+    note <- paste0(note,"_grp.y.gt",min.group.size.y)
+    plotdf <- plotdf %>%
+      mutate_at(vars(one_of(intersect(y.coln,feat.cate))),
+                ~ifelse(table(.)[.]<min.group.size.y,NA,.))
+  }
 
 
   ### calculate the pvalues
@@ -71,11 +101,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
 
 
   # plot only the max number of plots if number of significant plot is more than plot.max
-  if(!is.null(plot.max)&length(y.coln.plot)>plot.max) y.coln.plot <- y.coln.plot[1:plot.max]
-
-
-  # check which are categorical columns
-  feat.cate <- colnames(plotdf)[sapply(plotdf,function(x)!is.numeric(x))]
+  if(!is.null(plot.max)&(length(y.coln.plot)>plot.max)) y.coln.plot <- y.coln.plot[1:plot.max]
 
 
   # use different plots for different combinations of catergorical/numerical values
@@ -85,6 +111,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
       # Categorical
       if(x %in% feat.cate){
         message(":Cate ",appendLF=F)
+
         p <- ggbarstats(plotdf[!is.na(plotdf[,x.coln]),],!!x,!!x.coln,
                         title=x,conf.level=(1-signif.cutoff),
                         proportion.test = F,
@@ -119,6 +146,8 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
 
 
   plot.list <- setNames(plot.list,y.coln.plot)
+
+
 
 
   ## generate the ggarrange plot for the output
@@ -158,7 +187,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
   # save figure to outpdir
   if(!is.null(outpdir)){
     dir.create(outpdir,showWarnings=F,recursive=T)
-    pdf(paste0(outpdir,"/",x.coln,".pdf"),
+    pdf(paste0(outpdir,"/",x.coln,note,".pdf"),
         width=plot.w*plot.ncol,height = plot.h*plot.nrow)
     print(outp)
     dev.off()
@@ -169,7 +198,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
     print(outp)
   }
 
-  return(list(plot=outp,pval=pvalue))
+  return(list(plot=outp,pval=pvalue,note=note))
 
 }
 
@@ -184,7 +213,9 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
                       plot.it=F,
                       plot.nrow=NULL,plot.ncol=NULL,
                       signif.cutoff=0.05,
-                      plot.signif.only=F,plot.max=50,
+                      plot.signif.only=F,
+                      p.adj.method="bonferroni",
+                      plot.max=50,
                       seed=999,
                       outpdir=NULL,
                       plot.w=6.5,plot.h=7.5,...){
@@ -242,6 +273,9 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
       select(Features,everything())
 
     write.table(df.pval,paste0(outpdir,"/pvalues.tsv"),sep = "\t",row.names = F)
+
+    write.table(p_adjust_mat(df.pval,p.adj.method),
+                paste0(outpdir,"/padj.",p.adj.method,".tsv"),sep = "\t",row.names = F)
   }
 
   return(outp=lst.out)

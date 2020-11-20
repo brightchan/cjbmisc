@@ -17,6 +17,8 @@ plot_corr_one(
   signif.cutoff = 0.05,
   plot.signif.only = F,
   plot.max = 40,
+  min.group.size.x = 3,
+  min.group.size.y = 3,
   seed = 999,
   outpdir = NULL,
   plot.w = 6.5,
@@ -36,6 +38,7 @@ plot_corr(
   plot.ncol = NULL,
   signif.cutoff = 0.05,
   plot.signif.only = F,
+  p.adj.method = "bonferroni",
   plot.max = 50,
   seed = 999,
   outpdir = NULL,
@@ -63,6 +66,10 @@ plot_corr(
 
 \item{plot.max}{maximum how many plots to be plotted. If set to NULL then plot all.}
 
+\item{min.group.size.x}{for categorical x, remove groups that are smaller than this number}
+
+\item{min.group.size.y}{for categorical y, remove groups that are smaller than this number}
+
 \item{outpdir}{If not NULL, save all plots and pvalues (as table) to the outpdir}
 
 \item{plot.w, plot.h}{Width and height of each individual plot}
@@ -77,4 +84,8 @@ For plot_corr, List of returns from plot_corr_one. For plot_corr_one: List of tw
 \description{
 Plot the correlations focusing on a variable x vs all the rest
 of the variables.
+The workflow is: 1. remove small groups if "min.group.size" is defined;
+2. calculate the p values for all pairs of variables
+3. select the ones that pass pvalue threshold for plotting
+4. calculate padj and save the plots and pvalue tables.
 }
