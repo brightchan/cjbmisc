@@ -72,12 +72,22 @@ p_ContCont <- function(df,v1,v2,method="spearman"){
 #' @rdname getPvalue
 #' @export
 p_ContDisc <- function(df,v1,v2,method="kruskal.test"){
-  df <- as.data.frame(df)
-  if (plyr::is.discrete(df[,v1])){
-    df[,v1] <- as.factor(df[,v1])
+  if (plyr::is.discrete(df[[v1]])){
+    df[[v1]] <- as.factor(df[[v1]])
+    # if only one group, return NA
+    if(lenght(unique(df[[v1]]))==1) {
+      warning(paste0("Only one group found for ",v1,
+                     ", returning NA for ",method))
+      return(NA)
+    }
     f <- as.formula(paste0(v2,"~",v1))
   } else{
-    df[,v2] <- as.factor(df[,v2])
+    df[[v2]] <- as.factor(df[[v2]])
+    if(lenght(unique(df[[v2]]))==1) {
+      warning(paste0("Only one group found for ",v1,
+                     ", returning NA for ",method))
+      return(NA)
+    }
     f <- as.formula(paste0(v1,"~",v2))
   }
     get(method)(f, df)$p.value
@@ -85,9 +95,8 @@ p_ContDisc <- function(df,v1,v2,method="kruskal.test"){
 #' @rdname getPvalue
 #' @export
 p_lm <- function(df,v1,v2){
-  df <- as.data.frame(df)
-  x <- df[,v1]
-  y <- df[,v2]
+  x <- df[[v1]]
+  y <- df[[v2]]
   pvalue <- coef(summary(lm(y~x)))[2,4]
 }
 #' @rdname getPvalue
