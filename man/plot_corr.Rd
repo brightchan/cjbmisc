@@ -23,6 +23,7 @@ plot_corr_one(
   outpdir = NULL,
   plot.w = 6.5,
   plot.h = 7.5,
+  fn.suffix = "",
   ...
 )
 
@@ -44,6 +45,9 @@ plot_corr(
   outpdir = NULL,
   plot.w = 6.5,
   plot.h = 7.5,
+  min.group.size.x = 3,
+  min.group.size.y = 3,
+  fn.suffix = "",
   ...
 )
 }
@@ -73,6 +77,8 @@ plot_corr(
 \item{outpdir}{If not NULL, save all plots and pvalues (as table) to the outpdir}
 
 \item{plot.w, plot.h}{Width and height of each individual plot}
+
+\item{fn.suffix}{filename suffix}
 
 \item{...}{pass to \code{\link[ggstatsplot]{ggbarstats}} , \code{\link[ggstatsplot]{ggbetweenstats}} ,\code{\link[ggstatsplot]{ggscatterstats}}}
 

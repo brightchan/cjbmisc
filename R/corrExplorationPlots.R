@@ -22,6 +22,7 @@
 #' @param plot.it Whether to plot it out (T/F)
 #' @param outpdir If not NULL, save all plots and pvalues (as table) to the outpdir
 #' @param plot.w,plot.h Width and height of each individual plot
+#' @param fn.suffix filename suffix
 #' @param ... pass to \code{\link[ggstatsplot]{ggbarstats}} , \code{\link[ggstatsplot]{ggbetweenstats}} ,\code{\link[ggstatsplot]{ggscatterstats}}
 #' @return For plot_corr, List of returns from plot_corr_one. For plot_corr_one: List of two: "plot" of ggarrange object which arrange all plot into one, and "pvalues" of a named vector.
 #'
@@ -42,9 +43,9 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
                           min.group.size.y=3,
                           seed=999,
                           outpdir=NULL,
-                          plot.w=6.5,plot.h=7.5,...){
+                          plot.w=6.5,plot.h=7.5,
+                          fn.suffix="",...){
 
-  note <- ""
 
   set.seed(seed)
 
@@ -58,21 +59,22 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
   feat.cate <- colnames(plotdf)[sapply(plotdf,function(x)!is.numeric(x))]
 
 
-
   # remove small groups from categorical features by setting them to NA
-  # Keep a Note in the output file
-  if(!is.null(min.group.size.x)){
-    note <- paste0(note,"_grp.x.gt",min.group.size.x)
+  # Keep a Note in the output file suffix
+  if(!is.null(min.group.size.x)&x.coln%in%feat.cate){
+    fn.suffix <- paste0(fn.suffix,"_grp.x.gt",min.group.size.x)
     plotdf <- plotdf %>%
       mutate_at(vars(!!x.coln),~ifelse(table(.)[.]<min.group.size.x,NA,.))
   }
-  if(!is.null(min.group.size.y)){
-    note <- paste0(note,"_grp.y.gt",min.group.size.y)
+  if(!is.null(min.group.size.y)&any(y.coln%in%feat.cate)){
+    fn.suffix <- paste0(fn.suffix,"_grp.y.gt",min.group.size.y)
     plotdf <- plotdf %>%
       mutate_at(vars(one_of(intersect(y.coln,feat.cate))),
                 ~ifelse(table(.)[.]<min.group.size.y,NA,.))
   }
 
+
+  message("*****Plotting: ",x.coln," vs ",appendLF=F)
 
   ### calculate the pvalues
   pvalue <- p_xVsAll(plotdf,x.coln,y.coln,cat.num.test=cat.num.test,
@@ -80,7 +82,6 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
 
 
   ### generate all the plots
-  message("*****Plotting: ",x.coln," vs ",appendLF=F)
 
   y.coln.plot <- y.coln
 
@@ -187,7 +188,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
   # save figure to outpdir
   if(!is.null(outpdir)){
     dir.create(outpdir,showWarnings=F,recursive=T)
-    pdf(paste0(outpdir,"/",x.coln,note,".pdf"),
+    pdf(paste0(outpdir,"/",x.coln,fn.suffix,".pdf"),
         width=plot.w*plot.ncol,height = plot.h*plot.nrow)
     print(outp)
     dev.off()
@@ -198,7 +199,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
     print(outp)
   }
 
-  return(list(plot=outp,pval=pvalue,note=note))
+  return(list(plot=outp,pval=pvalue))
 
 }
 
@@ -218,7 +219,10 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
                       plot.max=50,
                       seed=999,
                       outpdir=NULL,
-                      plot.w=6.5,plot.h=7.5,...){
+                      plot.w=6.5,plot.h=7.5,
+                      min.group.size.x=3,
+                      min.group.size.y=3,
+                      fn.suffix="",...){
 
   # use all columns if y.coln not provided
   if(is.null(y.coln)) y.coln <- setdiff(colnames(plotdf),x.coln)
@@ -234,7 +238,8 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
              plot.it=plot.it,plot.nrow=plot.nrow,plot.ncol=plot.ncol,
              signif.cutoff=signif.cutoff,
              plot.signif.only=plot.signif.only,plot.max=plot.max,seed=seed,
-             outpdir=outpdir,...
+             outpdir=outpdir,min.group.size.x=min.group.size.x,
+             min.group.size.y=min.group.size.y,fn.suffix=fn.suffix,...
            )
            })
 
