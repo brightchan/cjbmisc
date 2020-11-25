@@ -75,7 +75,7 @@ p_ContDisc <- function(df,v1,v2,method="kruskal.test"){
   if (plyr::is.discrete(df[[v1]])){
     df[[v1]] <- as.factor(df[[v1]])
     # if only one group, return NA
-    if(lenght(unique(df[[v1]]))==1) {
+    if(length(unique(df[[v1]]))==1) {
       warning(paste0("Only one group found for ",v1,
                      ", returning NA for ",method))
       return(NA)
@@ -83,7 +83,7 @@ p_ContDisc <- function(df,v1,v2,method="kruskal.test"){
     f <- as.formula(paste0(v2,"~",v1))
   } else{
     df[[v2]] <- as.factor(df[[v2]])
-    if(lenght(unique(df[[v2]]))==1) {
+    if(length(unique(df[[v2]]))==1) {
       warning(paste0("Only one group found for ",v1,
                      ", returning NA for ",method))
       return(NA)
