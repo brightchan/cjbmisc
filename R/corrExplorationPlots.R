@@ -81,6 +81,26 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
   }
 
 
+  # Prompt WARNING and stop if x.coln only has one group
+  if(x.coln%in%feat.cate&(length(unique(na.omit(as.vector(plotdf[[x.coln]]))))<2)){
+    warning("Catergorical variable ", x.coln, " only have one effective group. Stop plotting.")
+    return(list(plot=NULL,pval=NULL))
+  }
+
+  # remove categorical y.coln if only one group remains
+  if(any(y.coln%in%feat.cate)){
+    count.feat <- plotdf %>% select(one_of(intersect(y.coln,feat.cate))) %>%
+      apply(2,function(x)length(unique(na.omit(x))))
+    y.coln <- setdiff(y.coln,names(count.feat[count.feat<2]))
+  }
+  # Prompt WARNING and stop if no more y.coln left
+  if(length(y.coln)==0){
+    warning("No more effective y column left. Stop plotting.")
+    return(list(plot=NULL,pval=NULL))
+  }
+
+
+
   message("*****Plotting: ",x.coln," vs ",appendLF=F)
 
   ### calculate the pvalues
@@ -89,6 +109,8 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
 
   if(!is.null(p.adj.method)) pvalue <- p.adjust(pvalue.raw,p.adj.method)
   else pvalue <- pvalue.raw
+
+
 
   ### generate all the plots
 

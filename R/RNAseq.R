@@ -67,3 +67,35 @@ write_cls <- function(subtype,clsfn){
                paste(as.numeric(as.factor(subtype)),collapse=" ")), fileConn)
   close(fileConn)
 }
+
+
+
+
+
+gageAna <- function(res,geneset=kegg.sets.hs,q=0.01){
+  foldchanges = res$log2FoldChange*(1-padj)
+  names(foldchanges) = res$entrezgene
+  foldchanges <- foldchanges[!is.na(names(foldchanges))]
+  foldchanges <- foldchanges[order(abs(foldchanges),decreasing = T)]
+  foldchanges <- foldchanges[!duplicated(foldchanges)]
+  keggres = gage::gage(foldchanges, gsets=geneset, same.dir=T,
+                       compare = "unpaired",use.stouffer=TRUE)
+  up <- na.omit(keggres$greater[,"q.val"])
+  up <- up[up<q]
+  #substring pathway names into two parts
+  up <- list(id=names(up),path.name=names(up),q.val=up)
+  down <- na.omit(keggres$less[,"q.val"])
+  down <- down[down<q]
+  down <- list(id=names(down),path.name=names(down),q.val=down)
+  message("up: ",paste0(up$id,"; \n"))
+  message("down: ",paste0(down$id,"; \n"))
+  list(up=up,down=down)
+}
+
+plot_pathview = function(res,pid,title) {
+  genes <- res$log2FoldChange
+  names(genes) <- row.names(res)
+  pathview(gene.data=genes, pathway.id=pid,
+           species="hsa", out.suffix=title, kegg.dir=paste0(outp,"/Pathview/"))
+}
+
