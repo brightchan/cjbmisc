@@ -15,13 +15,15 @@ plot_corr_one(
   plot.nrow = NULL,
   plot.ncol = NULL,
   signif.cutoff = 0.05,
+  plot.stattest = "np",
+  p.adj.method = NULL,
   plot.signif.only = F,
   plot.max = 40,
   min.group.size.x = 3,
   min.group.size.y = 3,
   seed = 999,
   outpdir = NULL,
-  plot.w = 6.5,
+  plot.w = 7,
   plot.h = 7.5,
   fn.suffix = "",
   ...
@@ -38,12 +40,14 @@ plot_corr(
   plot.nrow = NULL,
   plot.ncol = NULL,
   signif.cutoff = 0.05,
+  plot.stattest = "np",
   plot.signif.only = F,
-  p.adj.method = "bonferroni",
+  p.adj.method.each = NULL,
+  p.adj.method.all = "bonferroni",
   plot.max = 50,
   seed = 999,
   outpdir = NULL,
-  plot.w = 6.5,
+  plot.w = 7,
   plot.h = 7.5,
   min.group.size.x = 3,
   min.group.size.y = 3,
@@ -66,6 +70,8 @@ plot_corr(
 
 \item{plot.nrow, plot.ncol}{The number of rows and columns in the combined plot}
 
+\item{plot.stattest}{Pass to the "type" parameter in \code{\link[ggstatsplot]{ggbarstats}} , \code{\link[ggstatsplot]{ggbetweenstats}} ,\code{\link[ggstatsplot]{ggscatterstats}}, defining the stats test to be used. Default "np" is non-parametric.}
+
 \item{plot.signif.only}{whether to plot only the significant items}
 
 \item{plot.max}{maximum how many plots to be plotted. If set to NULL then plot all.}
@@ -83,6 +89,10 @@ plot_corr(
 \item{...}{pass to \code{\link[ggstatsplot]{ggbarstats}} , \code{\link[ggstatsplot]{ggbetweenstats}} ,\code{\link[ggstatsplot]{ggscatterstats}}}
 
 \item{cat.cat.test}{the significance test to be used for categorical vs categorical variables. Should be "fisher","chi" or "both"(Default)}
+
+\item{padj.method, padj.method.each, padj.method.all}{pvalue adjustment method. Should follow \code{\link[ggstatsplot]{ggbetweenstats}}.
+In plot_corr_one, if padj.method is specified, pvalue adjustment will be done and only those pass the padj threshold will be plotted.
+In plot_corr, padj.method.each will be passed to plot_corr_one while padj.method.all will be used to genearate the final padj table, adjusting for all pvalues.}
 }
 \value{
 For plot_corr, List of returns from plot_corr_one. For plot_corr_one: List of two: "plot" of ggarrange object which arrange all plot into one, and "pvalues" of a named vector.
@@ -92,6 +102,7 @@ Plot the correlations focusing on a variable x vs all the rest
 of the variables.
 The workflow is: 1. remove small groups if "min.group.size" is defined;
 2. calculate the p values for all pairs of variables
-3. select the ones that pass pvalue threshold for plotting
+3. select the ones that pass pvalue threshold for plotting.
+  Pvalues are by default non-parametric. Can choose if p.adjust should be used.
 4. calculate padj and save the plots and pvalue tables.
 }

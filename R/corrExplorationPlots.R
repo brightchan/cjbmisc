@@ -4,7 +4,8 @@
 #' of the variables.
 #' The workflow is: 1. remove small groups if "min.group.size" is defined;
 #' 2. calculate the p values for all pairs of variables
-#' 3. select the ones that pass pvalue threshold for plotting
+#' 3. select the ones that pass pvalue threshold for plotting.
+#'   Pvalues are by default non-parametric. Can choose if p.adjust should be used.
 #' 4. calculate padj and save the plots and pvalue tables.
 
 #'
@@ -15,6 +16,10 @@
 #' @param cat.cat.test the significance test to be used for categorical vs categorical variables. Should be "fisher","chi" or "both"(Default)
 #' @param num.num.test the significance test to be used for numerical vs numerical variables. Should be "spearman"(Default), "pearson", "kendall", or "lm"(using the pvalue of the independent variable in lm).
 #' @param plot.nrow,plot.ncol The number of rows and columns in the combined plot
+#' @param padj.method,padj.method.each,padj.method.all pvalue adjustment method. Should follow \code{\link[ggstatsplot]{ggbetweenstats}}.
+#' In plot_corr_one, if padj.method is specified, pvalue adjustment will be done and only those pass the padj threshold will be plotted.
+#' In plot_corr, padj.method.each will be passed to plot_corr_one while padj.method.all will be used to genearate the final padj table, adjusting for all pvalues.
+#' @param plot.stattest Pass to the "type" parameter in \code{\link[ggstatsplot]{ggbarstats}} , \code{\link[ggstatsplot]{ggbetweenstats}} ,\code{\link[ggstatsplot]{ggscatterstats}}, defining the stats test to be used. Default "np" is non-parametric.
 #' @param plot.signif.only whether to plot only the significant items
 #' @param plot.max maximum how many plots to be plotted. If set to NULL then plot all.
 #' @param min.group.size.x for categorical x, remove groups that are smaller than this number
@@ -37,13 +42,15 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
                           num.num.test="spearman",
                           plot.it=F,plot.nrow=NULL,plot.ncol=NULL,
                           signif.cutoff=0.05,
+                          plot.stattest="np",
+                          p.adj.method=NULL,
                           plot.signif.only=F,
                           plot.max=40,
                           min.group.size.x=3,
                           min.group.size.y=3,
                           seed=999,
                           outpdir=NULL,
-                          plot.w=6.5,plot.h=7.5,
+                          plot.w=7,plot.h=7.5,
                           fn.suffix="",...){
 
 
@@ -77,9 +84,11 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
   message("*****Plotting: ",x.coln," vs ",appendLF=F)
 
   ### calculate the pvalues
-  pvalue <- p_xVsAll(plotdf,x.coln,y.coln,cat.num.test=cat.num.test,
+  pvalue.raw <- p_xVsAll(plotdf,x.coln,y.coln,cat.num.test=cat.num.test,
                      num.num.test=num.num.test)
 
+  if(!is.null(p.adj.method)) pvalue <- p.adjust(pvalue.raw,p.adj.method)
+  else pvalue <- pvalue.raw
 
   ### generate all the plots
 
@@ -88,7 +97,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
   if(plot.signif.only){
     # Plot only siginificant plots
     # by ignoring all non-significant ones
-    if(sum(pvalue<signif.cutoff)>0){
+    if(sum(pvalue<signif.cutoff,na.rm=T)>0){
       y.coln.plot <- names(pvalue[pvalue<signif.cutoff])
     } else{
       warning("No significant correlation found.")
@@ -122,7 +131,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
         message(":Num ",appendLF=F)
         # TODO: add ggwithinstats support for groups with paired samples
         p <- ggbetweenstats(plotdf[!is.na(plotdf[,x.coln]),],!!x.coln,!!x,title=x,
-                            type = "np",# usually we should use non-parametric tests
+                            type = plot.stattest,# usually we should use non-parametric tests
                             pairwise.comparisons = TRUE,conf.level=(1-signif.cutoff),...)
         return(p) }
     })
@@ -133,14 +142,14 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
       if(y %in% feat.cate){
         message(":Cate ",appendLF=F)
         p <- ggbetweenstats(plotdf[!is.na(plotdf[,y]),],!!y,!!x.coln,title=y,
-                            type = "np",# usually we should use non-parametric tests
+                            type = plot.stattest,# usually we should use non-parametric tests
                             pairwise.comparisons = TRUE,conf.level=(1-signif.cutoff),...)
       } else {
         # Numeric
         message(":Num ",appendLF=F)
         # TODO: add ggwithinstats support for groups with paired samples
         p <- ggscatterstats(plotdf[!is.na(plotdf[,x.coln]),],!!x.coln,!!y,title=y,
-                            marginal.type="densigram",...)
+                            marginal.type="densigram",type =plot.stattest, ...)
         return(p) }
     })
   }
@@ -199,7 +208,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
     print(outp)
   }
 
-  return(list(plot=outp,pval=pvalue))
+  return(list(plot=outp,pval=pvalue.raw))
 
 }
 
@@ -211,15 +220,16 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
                       cat.num.test="kruskal.test",
                       cat.cat.test="both",
                       num.num.test="spearman",
-                      plot.it=F,
-                      plot.nrow=NULL,plot.ncol=NULL,
+                      plot.it=F,plot.nrow=NULL,plot.ncol=NULL,
                       signif.cutoff=0.05,
+                      plot.stattest="np",
                       plot.signif.only=F,
-                      p.adj.method="bonferroni",
+                      p.adj.method.each=NULL,
+                      p.adj.method.all="bonferroni",
                       plot.max=50,
                       seed=999,
                       outpdir=NULL,
-                      plot.w=6.5,plot.h=7.5,
+                      plot.w=7,plot.h=7.5,
                       min.group.size.x=3,
                       min.group.size.y=3,
                       fn.suffix="",...){
@@ -236,7 +246,8 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
              cat.num.test="kruskal.test",
              num.num.test="spearman",
              plot.it=plot.it,plot.nrow=plot.nrow,plot.ncol=plot.ncol,
-             signif.cutoff=signif.cutoff,
+             signif.cutoff=signif.cutoff,plot.stattest=plot.stattest,
+             p.adj.method=p.adj.method.each,
              plot.signif.only=plot.signif.only,plot.max=plot.max,seed=seed,
              outpdir=outpdir,min.group.size.x=min.group.size.x,
              min.group.size.y=min.group.size.y,fn.suffix=fn.suffix,...
@@ -279,8 +290,8 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
 
     write.table(df.pval,paste0(outpdir,"/pvalues.tsv"),sep = "\t",row.names = F)
 
-    write.table(p_adjust_mat(df.pval,p.adj.method),
-                paste0(outpdir,"/padj.",p.adj.method,".tsv"),sep = "\t",row.names = F)
+    write.table(cbind(df.pval[,1],p_adjust_mat(df.pval[,-1],p.adj.method.all)),
+                paste0(outpdir,"/padj.",p.adj.method.all,".tsv"),sep = "\t",row.names = F)
   }
 
   return(outp=lst.out)
