@@ -20,6 +20,8 @@ ggsurvpWrap <- function(survdf,fac,surv.time="OS_Month",surv.status="OS_Status",
   # if(is.null(col)) col <- c("#111111CF","#fd0d0dCF","#0fe00fEF","#090ee0CF","#4d1b7bCF",
   #                           "#f0d817CF","#483698FF","#832424FF","#005800FF","#3A3B98FF",
   #                           "#602995FF","#574700FF")
+  # avoid problems when using tibbles
+  survdf <- as.data.frame(survdf)
   if(is.numeric(survdf[,fac])) {
     if(is.na(cont.to.dis)) cont.to.dis <- median
     survdf[,fac] <- discretize(survdf[,fac],cont.to.dis) #transform

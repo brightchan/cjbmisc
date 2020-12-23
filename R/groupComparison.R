@@ -65,13 +65,13 @@ get_compdf <- function(metadf,feat.coln,sample.coln,comp="1vA",sep.grp="+"){
 }
 
 
-get_deg_DESeq2 <- function(countMat,name.feature,name.group1,name.group2,
-                           samID.grp1,samID.grp2,f.design=NULL,
-                           metadf=NULL,samID.coln=NULL,
-                           outpdir=NULL){
+get_DegDESeq2 <- function(countMat,name.feature,name.group1,name.group2,
+                   samID.grp1,samID.grp2,f.design=NULL,
+                   metadf=NULL,samID.coln=NULL,
+                   outpdir=NULL){
 
   # Input:
-  # countMat: matrix of raw counts, genes in rows, samples in columns
+  # countMat: data frame of raw counts, genes in rows, samples in columns, has 2 extra cols: 1st col = ensembl_id; 2nd col = gene symbol
   # name.feature,name.group1,name.group2: string, just the names
   # samID.grp1,samID.grp2: vectors of sample IDs (matching the countMat)
   # f.design: a string of the design such as "~Age+Gender". A design matrix and formula will be built based on this formula
@@ -80,25 +80,123 @@ get_deg_DESeq2 <- function(countMat,name.feature,name.group1,name.group2,
   # Output:
   # DESeq2 object?
 
+  ##########################################
+  # Generate coldata from df.para and design
+  ##########################################
 
-  if(!is.null(f.design)){
-  ## without a design formula
+  ## df for group1
+  grp1=data.frame(samID = samID.grp1,
+                  group = rep(name.group1, length(samID.grp1)))
+  ## df for group2
+  grp2=data.frame(samID = samID.grp2,
+                  group = rep(name.group2, length(samID.grp2)))
+  ## Join df1 & df2
+  grp12=rbind(grp1,grp2) %>%
+    rename_at(vars(group),~name.feature) %>%
+    rename_at(vars(samID),~samID.coln)
 
+  if(is.null(f.design)){
+    ## without a design formula
+
+    coldata <- grp12
+    design <- as.formula(paste0("~",name.feature))
 
   }else if (!is.null(metadf)&!is.null(samID.coln)){
-  ## with a design formula
+    ## with a design formula
 
+    coldata <- grp12 %>%
+      left_join(metadf %>%
+                  select(-all_of(name.feature)),
+                by=samID.coln)
+
+    design <- as.formula(f.design)
 
   }else stop("Please provide metadata to 'metadf' with a column specifying sample ID in 'samID.coln' for the experiment design")
 
 
-  # Save the result to outpdir
+  ##########################################
+  # Load, filter, reorder countdata
+  ##########################################
+  # -- Reorder the col (sample ID) so it will be the same order with coldata
+
+  countdata=countMat %>%
+    select(-2,1,coldata[[samID.coln]]) %>% # remove the 2nd col containing gene symbol
+    `rownames<-`(.[[1]]) %>%  # make the 1st col containing ensembl id as rownames
+    select(coldata[[samID.coln]]) # order the countdata column
+
+  all(colnames(countdata)==coldata$RNA_lib) # check if the order of sample ID between coldata and countdata is the same
+
+  #####################################
+  # Perform DGE
+  #####################################
+  # -- Check first if the is custom design
+
+  message("Performing DGE using DESeq2 ...")
+  message(paste0("Analysing ", nrow(countdata), " genes in ", ncol(countdata), " samples"))
+
+  dds <- DESeqDataSetFromMatrix(countData= round(countdata),
+                                colData = coldata,
+                                design = design)
+  dds <- DESeq(dds) # DGE
+  contrast <- c(name.feature,name.group1,name.group2) # specify group that want to compare
+  res.dds <- results(dds, contrast) # result
+  res.dds <- res.dds[order(res.dds$padj),] # order the result table based on p-adjust
+  head(res.dds)
+  message("DGE analysis finished, saving results ...")
+
+  ###########################################
+  # Save the result
+  ###########################################
+
   if(!is.null(outpdir)){
-    fn <- paste0(outpdir,"/",name.feature,"_",name.group1,"_vs_",name.group2,".tsv")
-    write_tsv(xxx,fn)
+
+    dir.create(paste0(outpdir,"/",name.feature)) # create subfolder based on feature
+    resdir <- paste0(outpdir,"/",name.feature)
+
+    # R object
+    fn.rds <- paste0(resdir,"/S01_dge_",name.feature,"_",name.group1,"_vs_",name.group2,".RDS") # file name
+    saveRDS(res.dds,fn.rds)
+
+    # data.frame
+
+    sym=countMat %>%
+      select(1:2) %>% `colnames<-`(c("Geneid","gene_name")) # extract the gene symbol and ensembl id from count matrix so I can put back the gene symbol in DGE result
+
+    res.dds.df=as.data.frame(res.dds) %>%
+      tibble::rownames_to_column(var="Geneid") %>%
+      left_join(sym, by="Geneid") %>% # join with gene symbol
+      select(Geneid,gene_name,everything())
+
+    fn.tsv <- paste0(resdir,"/S01_dge_",name.feature,"_",name.group1,"_vs_",name.group2,".tsv") # file name
+    write_tsv(res.dds.df,fn.tsv)
+
+    fn.col <- paste0(resdir,"/S01_dge_coldata_",name.feature,"_",name.group1,"_vs_",name.group2,".tsv")
+    write_tsv(coldata,fn.col)
+
+    system(paste0("touch ",resdir, "/Design_",as.character(design) %>% paste0(collapse = "")))
+
+    if(!is.null(metadf)){
+
+      fn.meta <- paste0(resdir,"/S01_dge_metadata_",name.feature,"_",name.group1,"_vs_",name.group2,".tsv")
+      write_tsv(metadf,fn.meta)
+    }
+
   }
 
-  return(xxx)
+  return(list(des=res.dds,df=res.dds.df))
 
 }
+
+fgseaWrap <- function(fn.gmt,ID.gene,stat.gene,minSize=20,maxSize=200,
+                      fn.outp=NULL,...){
+  pathways <-  fgsea::gmtPathways(fn.gmt)
+  fgseaRes <-  fgsea(pathways=pathways, stats=scores %>% sort(.,decreasing = T),
+                     minSize = minSize,maxSize = maxSize,...)
+
+  if(!is.null(fn.outp)) write_tsv(fgseaRes,fn.outp)
+
+  return(fgseaRes)
+}
+
+
 

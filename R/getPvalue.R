@@ -11,6 +11,8 @@
 #'   \item p_lm: p-value of the coefficient from the univariate \code{\link[stats]{lm}}
 #'   \item p_adjust_mat: adjust a matrix of p-values
 #'   \item p_xVsAll: generate a vector of pvalues by contrasting x vs all the rest of the variables in a dataframe.
+#'   \item p_dfAll: generate a df of pvalues by contrasting all x.coln vs all y.coln. parameters are the same as in p_xVsAll
+#'   \item p_uniCox: generate a list of univariate Cox models and a vector of the minimal pvalue from each model
 #'   \item p_feat_subtype: p-value of a set of features according to a subtype in a manner similar to \code{\link[cjbmisc]{plot_feat_subtype}}
 #' }
 #' @param df numeric dataframe
@@ -142,6 +144,93 @@ p_xVsAll <- function(df,x.coln,y.coln=NULL,
 
   return(vec.p)
 }
+
+#' @rdname getPvalue
+#' @export
+p_dfAll <- function(df,x.coln,y.coln=NULL,...){
+  if(is.null(y.coln)) y.coln <- setdiff(colnames(df),x.coln)
+
+  lst.pval <- lapply(setNames(x.coln,x.coln),function(x)
+    p_xVsAll(df,x,y.coln,...) %>% as.data.frame())
+
+
+  df.pval <- lapply(names(lst.pval), function(n) {
+    colnames(lst.pval[[n]]) <- n
+    lst.pval[[n]]$Features <- row.names(lst.pval[[n]])
+    return(lst.pval[[n]])
+  }) %>% Reduce(full_join, .) %>% select(Features, everything())
+
+  return(df.pval)
+}
+
+#' @rdname getPvalue
+#' @export
+p_uniCox <- function(survdf,
+                     feat,
+                     surv.time = "PFS.days",
+                     surv.status = "PFS.status",
+                     signif.cutoff=0.05,
+                     keep.all.in.barplot=F,
+                     plot.surv=T,
+                     survp.xlim=c(0,1400),
+                     survp.timebreak= 365){
+  feat.missing <- setdiff(feat,colnames(survdf))
+  if(length(feat.missing)!=0) message(paste0(feat.missing,collapse = ", "),
+                                      " are not in the provided dataframe!")
+  feat <- intersect(feat,colnames(survdf))
+
+  # fit each feat into a Cox model and return the minimal pvalue.
+  lst.fit <- lapply(feat %>% setNames(.,.),
+                    function(x){
+                      message(x," ",appendLF =F)
+                      if(length(unique(na.omit(pull(survdf,!!x))))<2) return(NA)
+                      fit <- coxph(as.formula(paste0("Surv(",surv.time,",",surv.status,")~`",x,"`")),
+                                   data = survdf)
+                    })
+  pval <- sapply(lst.fit,function(x)if(!is.na(x))min(summary(x)$coefficients[,5]) else return(NA))
+  names(pval) <- gsub("\\.pvalue","",names(pval))
+
+  # Plot the pvalues
+
+  if(keep.all.in.barplot){
+    par(mar=c(max(nchar(feat))/3+0.5,5,1,1))
+    barplot(-log(sort(pval)),
+            las=2,cex.names =0.8,ylab="-log(Pvalue)",
+            main="Pvalues of Univariate Cox")
+    abline(h=-log(signif.cutoff),lty=2)
+  }else if(sum(pval<signif.cutoff,na.rm=T)>0){
+    par(mar=c(1+(max(nchar(feat))/2.8),5,1,1))
+    barplot(-log(sort(pval[pval<signif.cutoff])),
+            las=2,cex.names =0.8,ylab="-log(Pvalue)",
+            main="Pvalues of Univariate Cox")
+    abline(h=-log(signif.cutoff),lty=2)
+
+  }
+
+  ## plot the Kaplan-Meier plots
+  if(plot.surv & (sum(pval<signif.cutoff)>0) ){
+    lst.plot <- lapply(names(sort(pval[pval<signif.cutoff])) %>%
+                         setNames(.,.),function(x){
+                           p <- cjbmisc::ggsurvpWrap(df.merge.suvival %>% as.data.frame(),
+                                                     x,surv.time,surv.status,
+                                                     risk.table = T,xlim = survp.xlim,
+                                                     break.time.by = survp.timebreak)$plot+
+                             theme(legend.key.size=unit(0.2,"cm"))
+                           return(p)
+                         }
+    )
+
+    p <-ggpubr::ggarrange(plotlist = lst.plot)
+    plot(p)
+
+    return(list(fit=lst.fit,pval=pval,plot=p))
+  }else
+
+    return(list(fit=lst.fit,pval=pval))
+
+}
+
+
 #' @rdname getPvalue
 #' @export
 p_adjust_mat <- function(pvaldf, p.adjust.method = "BH") {

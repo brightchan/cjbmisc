@@ -8,6 +8,8 @@
 \alias{p_ContDisc}
 \alias{p_lm}
 \alias{p_xVsAll}
+\alias{p_dfAll}
+\alias{p_uniCox}
 \alias{p_adjust_mat}
 \title{Returning only the p values}
 \usage{
@@ -30,6 +32,20 @@ p_xVsAll(
   cat.cat.test = "both"
 )
 
+p_dfAll(df, x.coln, y.coln = NULL, ...)
+
+p_uniCox(
+  survdf,
+  feat,
+  surv.time = "PFS.days",
+  surv.status = "PFS.status",
+  signif.cutoff = 0.05,
+  keep.all.in.barplot = F,
+  plot.surv = T,
+  survp.xlim = c(0, 1400),
+  survp.timebreak = 365
+)
+
 p_adjust_mat(pvaldf, p.adjust.method = "BH")
 }
 \arguments{
@@ -45,15 +61,15 @@ p_adjust_mat(pvaldf, p.adjust.method = "BH")
 
 \item{method}{p_ContDisc: the test method to-be-used, can be t.test, kruskal.test or wilcox.test}
 
-\item{subtype}{column name of the subtype}
+\item{...}{for p_feat_subtype, pass to \code{\link[cjbmisc]{p_fish.chi.t}}}
 
 \item{feat}{character vector of the features to be calculated}
+
+\item{subtype}{column name of the subtype}
 
 \item{cont.test}{the significance test to be used for continuous variables. Use the name of the r basic tests.}
 
 \item{disc.test}{the significance test to be used for discrete variables. Should be "fisher","chi" or"both"}
-
-\item{...}{for p_feat_subtype, pass to \code{\link[cjbmisc]{p_fish.chi.t}}}
 }
 \description{
 A group of functions to return only the p values from various of tests.
@@ -67,6 +83,8 @@ A group of functions to return only the p values from various of tests.
   \item p_lm: p-value of the coefficient from the univariate \code{\link[stats]{lm}}
   \item p_adjust_mat: adjust a matrix of p-values
   \item p_xVsAll: generate a vector of pvalues by contrasting x vs all the rest of the variables in a dataframe.
+  \item p_dfAll: generate a df of pvalues by contrasting all x.coln vs all y.coln. parameters are the same as in p_xVsAll
+  \item p_uniCox: generate a list of univariate Cox models and a vector of the minimal pvalue from each model
   \item p_feat_subtype: p-value of a set of features according to a subtype in a manner similar to \code{\link[cjbmisc]{plot_feat_subtype}}
 }
 }

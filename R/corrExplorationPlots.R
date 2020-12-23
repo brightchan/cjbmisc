@@ -111,16 +111,14 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
   else pvalue <- pvalue.raw
 
 
-
   ### generate all the plots
 
-  y.coln.plot <- y.coln
 
   if(plot.signif.only){
     # Plot only siginificant plots
     # by ignoring all non-significant ones
     if(sum(pvalue<signif.cutoff,na.rm=T)>0){
-      y.coln.plot <- names(pvalue[pvalue<signif.cutoff])
+      y.coln.plot <- na.omit(names(pvalue[pvalue<signif.cutoff]))
     } else{
       warning("No significant correlation found.")
       return(list(plot=NULL,pval=pvalue))
@@ -131,6 +129,8 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
   # Arrange the seqeunce of plots by pvalues
   y.coln.plot <- y.coln.plot[order(pvalue[y.coln.plot])]
 
+  # remove NA values
+  y.coln.plot <- na.omit(y.coln.plot)
 
   # plot only the max number of plots if number of significant plot is more than plot.max
   if(!is.null(plot.max)&(length(y.coln.plot)>plot.max)) y.coln.plot <- y.coln.plot[1:plot.max]
