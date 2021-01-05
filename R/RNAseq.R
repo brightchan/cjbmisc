@@ -99,3 +99,9 @@ plot_pathview = function(res,pid,title) {
            species="hsa", out.suffix=title, kegg.dir=paste0(outp,"/Pathview/"))
 }
 
+
+
+
+
+
+

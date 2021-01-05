@@ -123,7 +123,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
       warning("No significant correlation found.")
       return(list(plot=NULL,pval=pvalue))
     }
-  }
+  }else{y.coln.plot <- y.coln}
 
 
   # Arrange the seqeunce of plots by pvalues
@@ -312,7 +312,7 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
 
     write.table(df.pval,paste0(outpdir,"/pvalues.tsv"),sep = "\t",row.names = F)
 
-    write.table(cbind(df.pval[,1],p_adjust_mat(df.pval[,-1],p.adj.method.all)),
+    write.table(cbind(df.pval[,1,drop=F],p_adjust_mat(df.pval[,-1,drop=F],p.adj.method.all)),
                 paste0(outpdir,"/padj.",p.adj.method.all,".tsv"),sep = "\t",row.names = F)
   }
 
