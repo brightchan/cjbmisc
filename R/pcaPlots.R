@@ -27,39 +27,52 @@ NULL
 #' @import ggplot2
 #' @import ggfortify
 # PCA plot. Input data.frame of countdata, vector of subtype and diff as in coldata for the htmap
-pca <- function(df,A,B=NULL,title="PCA",col=colpal,
+
+pca <- function(df,A,B=NULL,title="PCA",
+                col=c("#111111CF", "#fd0d0dCF", "#0fe00fEF", "#090ee0CF",
+                      "#4d1b7bCF", "#f0d817CF"),
                 nameA="subtypeA",nameB="subtypeB",
                 point.size=4,shapes=c(16:18,15),
+                label.points=FALSE,lab=NA,
                 plot.it=TRUE,return.data=FALSE){
   pr <- prcomp(df)
   perc <- round((pr$sdev)^2 / sum(pr$sdev^2)*100,digits=2) #Percentage of each PC
+  
   if(is.null(B)){
-    anno <- data.frame(pr$x[,c(1:2)],A)
+    anno <- data.frame(pr$x[,c(1:2)],A,lab=lab)
     colnames(anno)[3] <- nameA
-    p <- ggplot()+
-      geom_point(data=anno,aes_string(x="PC1",y="PC2",colour=nameA),
-                 size=point.size,shapes=shapes[1])+
-      ggtitle(title)+
-      xlab(paste0("PC1 (",perc[1],"%)"))+
-      ylab(paste0("PC2 (",perc[2],"%)"))+
-      scale_colour_manual(values=unname(col))
+    p <- ggplot(data=anno,aes_string(x="PC1",y="PC2",
+                                     colour=nameA,label="lab"))+
+      geom_point(size=point.size,shapes=shapes[1])
   }
   else{
-    anno <- data.frame(pr$x[,c(1:2)],A,B)
+    anno <- data.frame(pr$x[,c(1:2)],A,B,lab=lab)
     colnames(anno)[3:4] <- c(nameA,nameB)
-    p <- ggplot()+
-      geom_point(data=anno,aes_string(x="PC1",y="PC2",colour=nameA,shape=nameB),
+    p <- ggplot(data=anno,aes_string(x="PC1",y="PC2",
+                                     colour=nameA,label="lab"))+
+      geom_point(colour=nameA,shape=nameB,
                  size=point.size)+
-      ggtitle(title)+
-      xlab(paste0("PC1 (",perc[1],"%)"))+
-      ylab(paste0("PC2 (",perc[2],"%)"))+
-      scale_colour_manual(values=unname(col))+
       scale_shape_manual(values=shapes)
   }
+  
+  p <- p+
+    ggtitle(title)+
+    xlab(paste0("PC1 (",perc[1],"%)"))+
+    ylab(paste0("PC2 (",perc[2],"%)"))+
+    scale_colour_manual(values=unname(col))
+  
+  
+  if(label.points&!is.na(lab)){
+    p <- p+geom_text_repel()
+  }
+  
   if(plot.it) print(p)
   if(return.data)return(list(p=p,pr=pr,perc=perc))
   return(p)
 }
+
+
+
 
 
 

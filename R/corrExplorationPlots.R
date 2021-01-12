@@ -70,14 +70,20 @@ plot_corr_one <- function(plotdf,x.coln,y.coln,
   # Keep a Note in the output file suffix
   if(!is.null(min.group.size.x)&x.coln%in%feat.cate){
     fn.suffix <- paste0(fn.suffix,"_grp.x.gt",min.group.size.x)
+	
+	# to maintain level sequence of the factor, need some longer code...
     plotdf <- plotdf %>%
-      mutate_at(vars(!!x.coln),~ifelse(table(.)[.]<min.group.size.x,NA,.))
+      #mutate_at(vars(!!x.coln),~ifelse(table(.)[.]<min.group.size.x,NA,.))
+	  mutate_at(vars(!!x.coln),~factor(ifelse(table(.x)[.x]<min.group.size.x,NA,as.character(.x)),
+	                                   levels = levels(as.factor(.x)))) 
   }
   if(!is.null(min.group.size.y)&any(y.coln%in%feat.cate)){
     fn.suffix <- paste0(fn.suffix,"_grp.y.gt",min.group.size.y)
     plotdf <- plotdf %>%
       mutate_at(vars(one_of(intersect(y.coln,feat.cate))),
-                ~ifelse(table(.)[.]<min.group.size.y,NA,.))
+                #~ifelse(table(.)[.]<min.group.size.y,NA,.))
+				~factor(ifelse(table(.x)[.x]<min.group.size.x,NA,as.character(.x)),
+   				        levels = levels(as.factor(.x))))
   }
 
 
