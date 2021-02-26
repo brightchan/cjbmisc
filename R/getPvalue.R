@@ -208,10 +208,10 @@ p_uniCox <- function(survdf,
   }
 
   ## plot the Kaplan-Meier plots
-  if(plot.surv & (sum(pval<signif.cutoff)>0) ){
+  if(plot.surv & (sum(pval<signif.cutoff,na.rm=T)>0) ){
     lst.plot <- lapply(names(sort(pval[pval<signif.cutoff])) %>%
                          setNames(.,.),function(x){
-                           p <- cjbmisc::ggsurvpWrap(df.merge.suvival %>% as.data.frame(),
+                           p <- cjbmisc::ggsurvpWrap(survdf %>% as.data.frame(),
                                                      x,surv.time,surv.status,
                                                      risk.table = T,xlim = survp.xlim,
                                                      break.time.by = survp.timebreak)$plot+

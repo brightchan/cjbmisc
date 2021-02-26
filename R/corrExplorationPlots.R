@@ -37,7 +37,7 @@
 #' @import dplyr
 #'
 #' @export
-plot_corr_one <- function(plotdf,x.coln,y.coln,
+plot_corr_one <- function(plotdf,x.coln,y.coln=NULL,
                           cat.num.test="kruskal.test",
                           num.num.test="spearman",
                           plot.it=F,plot.nrow=NULL,plot.ncol=NULL,
@@ -270,7 +270,7 @@ plot_corr <- function(plotdf,x.coln,y.coln=NULL,
   lst.out <- lapply(setNames(x.coln,x.coln),
          function(x){
            plot_corr_one(
-             plotdf,x,y.coln=setdiff(y.coln,x),
+             plotdf,x,y.coln=y.coln,
              cat.num.test="kruskal.test",
              num.num.test="spearman",
              plot.it=plot.it,plot.nrow=plot.nrow,plot.ncol=plot.ncol,
