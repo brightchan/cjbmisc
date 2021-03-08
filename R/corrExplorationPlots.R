@@ -150,7 +150,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln=NULL,
       if(x %in% feat.cate){
         message(":Cate ",appendLF=F)
 
-        p <- ggbarstats(plotdf[!is.na(plotdf[,x.coln]),],!!x,!!x.coln,
+        p <- ggbarstats(plotdf[!is.na(plotdf[[x.coln]]),],!!x,!!x.coln,
                         title=x,conf.level=(1-signif.cutoff),
                         proportion.test = F,
                         ...)
@@ -158,7 +158,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln=NULL,
         # Numeric
         message(":Num ",appendLF=F)
         # TODO: add ggwithinstats support for groups with paired samples
-        p <- ggbetweenstats(plotdf[!is.na(plotdf[,x.coln]),],!!x.coln,!!x,title=x,
+        p <- ggbetweenstats(plotdf[!is.na(plotdf[[x.coln]]),],!!x.coln,!!x,title=x,
                             type = plot.stattest,# usually we should use non-parametric tests
                             pairwise.comparisons = TRUE,conf.level=(1-signif.cutoff),...)
         return(p) }
@@ -169,14 +169,14 @@ plot_corr_one <- function(plotdf,x.coln,y.coln=NULL,
       # Categorical
       if(y %in% feat.cate){
         message(":Cate ",appendLF=F)
-        p <- ggbetweenstats(plotdf[!is.na(plotdf[,y]),],!!y,!!x.coln,title=y,
+        p <- ggbetweenstats(plotdf[!is.na(plotdf[[y]]),],!!y,!!x.coln,title=y,
                             type = plot.stattest,# usually we should use non-parametric tests
                             pairwise.comparisons = TRUE,conf.level=(1-signif.cutoff),...)
       } else {
         # Numeric
         message(":Num ",appendLF=F)
         # TODO: add ggwithinstats support for groups with paired samples
-        p <- ggscatterstats(plotdf[!is.na(plotdf[,x.coln]),],!!x.coln,!!y,title=y,
+        p <- ggscatterstats(plotdf[!is.na(plotdf[[x.coln]]),],!!x.coln,!!y,title=y,
                             marginal.type="densigram",type =plot.stattest, ...)
         return(p) }
     })
@@ -211,8 +211,8 @@ plot_corr_one <- function(plotdf,x.coln,y.coln=NULL,
       plot.ncol=plot.ncol.max
     }else{
       nm <- grDevices::n2mfrow(n.plots)
-      plot.nrow = nm[1]
-      plot.ncol = nm[2]
+      plot.nrow = nm[2]
+      plot.ncol = nm[1]
     }
   }
 
