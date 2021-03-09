@@ -70,14 +70,30 @@ perm <- function(n){
 #' @rdname cjb.misc
 #' @export
 # Force a to use number symbol more consistent with r
-consistSymbol <- function(a,r){#a,r:numeric factor vector;r:ref
-  a <- as.factor(a)
+consistSymbol <- function(x,r,return.all=F){
+  # x,r: vector of the subtypes;r:ref to be matched
+  # if multiple match show the same number of match, when "return.all" is True,
+  # a matrix of all possible match will be returned
+  
+  x <- as.factor(x)
   r <- as.factor(r)
+  
+  r.lev <- levels(r)
+  
+  # get all possible permutations of the input subtype names
   p <- perm(length(levels(r)))
-  temp <- apply(p,1,function(x) x[a])
-  sum <- apply(temp,2,function(x) sum(x==r))
-  return(temp[,which(sum==max(sum))]) # when 2 equal number occur, return both
-}
+  temp <- apply(p,1,function(a) a[x])
+  
+  # count which one matched the most with the reference input
+  sum <- apply(temp,2,function(x) sum(x==as.numeric(r)))
+  
+  # when 2 equal number occur, whether to return both
+  out=apply(temp[,which(sum==max(sum)),drop=F],2,function(x)r.lev[x])
+  if (return.all)  
+    return(out)
+  else
+    return(out[,1])
+}              
 #' @rdname cjb.misc
 #' @export
 #grep a vector from another vector, return a list
