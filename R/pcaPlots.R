@@ -50,7 +50,7 @@ pca <- function(df,A,B=NULL,title="PCA",
     colnames(anno)[3:4] <- c(nameA,nameB)
     p <- ggplot(data=anno,aes_string(x="PC1",y="PC2",
                                      colour=nameA,label="lab"))+
-      geom_point(colour=nameA,shape=nameB,
+      geom_point(aes_string(colour=nameA,shape=nameB),
                  size=point.size)+
       scale_shape_manual(values=shapes)
   }
