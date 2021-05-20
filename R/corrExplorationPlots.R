@@ -74,7 +74,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln=NULL,
 	# to maintain level sequence of the factor, need some longer code...
     plotdf <- plotdf %>%
       #mutate_at(vars(!!x.coln),~ifelse(table(.)[.]<min.group.size.x,NA,.))
-	  mutate_at(vars(!!x.coln),~factor(ifelse(table(.x)[.x]<min.group.size.x,NA,as.character(.x)),
+	  mutate_at(vars(!!x.coln),~factor(ifelse(table(.x)[as.character(.x)]<min.group.size.x,NA,as.character(.x)),
 	                                   levels = levels(as.factor(.x)))) 
   }
   if(!is.null(min.group.size.y)&any(y.coln%in%feat.cate)){
@@ -82,7 +82,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln=NULL,
     plotdf <- plotdf %>%
       mutate_at(vars(one_of(intersect(y.coln,feat.cate))),
                 #~ifelse(table(.)[.]<min.group.size.y,NA,.))
-				~factor(ifelse(table(.x)[.x]<min.group.size.x,NA,as.character(.x)),
+				~factor(ifelse(table(.x)[as.character(.x)]<min.group.size.x,NA,as.character(.x)),
    				        levels = levels(as.factor(.x))))
   }
 
