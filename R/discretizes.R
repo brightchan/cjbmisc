@@ -22,21 +22,33 @@ NULL
 #' @rdname discretizes
 #' @export
 #cut continuous vector to discrete with gt/lt number label.
-discretize <- function(x,cutoff,label=NULL,include.lowest=TRUE,summary=FALSE){
+discretize <- function (x, cutoff, label = NULL, include.lowest = TRUE, summary = FALSE) 
+{
   if (is.function(cutoff)) {
-    if(length(cutoff(na.omit(x)))==1) {
-      cutoff <- c(min(x,na.rm=TRUE),cutoff(na.omit(x)),max(x,na.rm=TRUE))
-    } else cutoff <- cutoff(na.omit(x))
-  } else cutoff <- c(min(x,na.rm=TRUE),cutoff,max(x,na.rm=TRUE))
-  #add label for the discretized vector
-  cutlabel <- signif(cutoff,3)
-    if(is.null(label)){
-      label <- c(paste0("<=",cutlabel[2]))
-      if(length(cutoff)>3) for(i in 2:(length(cutoff)-2)) label <- c(label,paste0(cutlabel[i],"-",cutlabel[i+1]))
-      label <- c(label,paste0(">",cutlabel[length(cutoff)-1]))
+    if (length(cutoff(na.omit(x))) == 1) {
+      cutoff = cutoff(na.omit(x))
+      if (cutoff == min(x, na.rm = T)) 
+        cutoff = sort(unique(x))[2]
+      if (cutoff == max(x, na.rm = T)) 
+        cutoff = sort(unique(x), decreasing = T)[2]
+      cutoff <- c(min(x, na.rm = TRUE), cutoff, max(x, 
+        na.rm = TRUE))
     }
-  out <- cut(x,cutoff,label,include.lowest=include.lowest)
-  if(summary) print(table(out))
+    else cutoff <- cutoff(na.omit(x))
+  }
+  else cutoff <- c(min(x, na.rm = TRUE), cutoff, max(x, na.rm = TRUE))
+  cutlabel <- signif(cutoff, 3)
+  if (is.null(label)) {
+    label <- c(paste0("<=", cutlabel[2]))
+    if (length(cutoff) > 3) 
+      for (i in 2:(length(cutoff) - 2)) label <- c(label, 
+        paste0(cutlabel[i], "-", cutlabel[i + 1]))
+    label <- c(label, paste0(">", cutlabel[length(cutoff) - 
+      1]))
+  }
+  out <- cut(x, cutoff, label, include.lowest = include.lowest)
+  if (summary) 
+    print(table(out))
   return(out)
 }
 #' @rdname discretizes
