@@ -1,6 +1,5 @@
 This is a repo for my miscellaneous R functions.
-Need to manually install ‘org.Hs.eg.db’, ‘TxDb.Hsapiens.UCSC.hg19.knownGene’ from bioconductor, or some functions might not work. 
-source("https://bioconductor.org/biocLite.R")
-biocLite("org.Hs.eg.db")
-biocLite("TxDb.Hsapiens.UCSC.hg19.knownGene")
+Need to manually install some packages from bioconductor or github.
+install.packages(c("tidyverse","ggstatsplot","survminer","BiocManager"))
+BiocManager::install(c("ComplexHeatmap","org.Hs.eg.db","TxDb.Hsapiens.UCSC.hg19.knownGene"))
 devtools::install_github("brightchan/cjbmisc") # install with this
