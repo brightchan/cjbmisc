@@ -40,6 +40,7 @@
 plot_corr_one <- function(plotdf,x.coln,y.coln=NULL,
                           cat.num.test="kruskal.test",
                           num.num.test="spearman",
+			  cat.cat.test="chi",
                           plot.it=F,plot.nrow=NULL,plot.ncol=NULL,
                           signif.cutoff=0.05,
                           plot.stattest="np",
@@ -111,7 +112,7 @@ plot_corr_one <- function(plotdf,x.coln,y.coln=NULL,
 
   ### calculate the pvalues
   pvalue.raw <- p_xVsAll(plotdf,x.coln,y.coln,cat.num.test=cat.num.test,
-                     num.num.test=num.num.test)
+                     num.num.test=num.num.test,cat.cat.test=cat.cat.test)
 
   if(!is.null(p.adj.method)) pvalue <- p.adjust(pvalue.raw,p.adj.method)
   else pvalue <- pvalue.raw
