@@ -34,7 +34,7 @@ NULL
 #' @rdname getPvalue
 #' @export
 # Only return p values:
-p_fish.chi.t <- function(df,v1,v2,alt="two.sided",p.test="both",ws=2e6){
+p_fish.chi.t <- function(df,v1,v2,alt="two.sided",p.test="chi",ws=2e6){
   df <- as.data.frame(df)
   if(p.test=="both"){
     tryCatch(fish.t(df,v1,v2,alt,ws)$p.value,
@@ -109,7 +109,7 @@ p_lm <- function(df,v1,v2){
 p_xVsAll <- function(df,x.coln,y.coln=NULL,
                      num.num.test="spearman",
                      cat.num.test="kruskal.test",
-                     cat.cat.test="both"){
+                     cat.cat.test="chi"){
 
   df <- as.data.frame(df)
   # use all columns if y.coln not provided
