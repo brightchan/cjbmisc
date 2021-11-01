@@ -1,5 +1,5 @@
 This is a repo for my miscellaneous R functions.
 Need to manually install some packages from bioconductor or github.
-install.packages(c("tidyverse","ggstatsplot","survminer","BiocManager"))
+install.packages(c("tidyverse","ggstatsplot","survminer","BiocManager","ggExtra"))
 BiocManager::install(c("ComplexHeatmap","org.Hs.eg.db","TxDb.Hsapiens.UCSC.hg19.knownGene"))
 devtools::install_github("brightchan/cjbmisc") # install with this
